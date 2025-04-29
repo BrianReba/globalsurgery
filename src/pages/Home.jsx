@@ -1,18 +1,14 @@
-import React from "react";
-import Navbar from "../components/Navbar";
-import { EmblaCarousel } from "../components/EmblaCarousel";
-import About from "../components/About";
-import Footer from "../components/Footer";
-import WhatsAppButton from "../components/WhatsAppButton";
+import React from 'react';
+import HeroBanner from '../components/HeroBanner';
+import About from '../components/About';
+import WhatsAppButton from '../components/WhatsAppButton';
 
 const Home = () => {
   return (
     <div>
-      <Navbar />
-      <EmblaCarousel />
+      <HeroBanner />
       <About />
       <WhatsAppButton />
-      <Footer />
     </div>
   );
 };
