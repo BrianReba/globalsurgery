@@ -53,10 +53,7 @@ const HeroBanner = () => {
           </div>
           <Link
             to='/services'
-            from-cyan-700
-            to-cyan-800from-cyan-700
-            to-cyan-800
-            className='mt-5 mb-5 bg-cyan-800 hover:bg-cyan-900 text-white font-poppins font-medium py-2 px-6 rounded-lg shadow-lg transition-all duration-300 w-full max-w-md sm:w-auto'
+            className='mt-5 mb-5 bg-gradient-to-r from-cyan-700 to-cyan-800 hover:bg-cyan-900 text-white font-poppins font-medium py-2 px-6 rounded-lg shadow-lg transition-all duration-300 w-full max-w-md sm:w-auto'
           >
             Conocer nuestros servicios
           </Link>

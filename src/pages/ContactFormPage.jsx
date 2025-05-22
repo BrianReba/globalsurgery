@@ -1,76 +1,24 @@
-import React, { useState, useRef } from 'react';
-import emailjs from '@emailjs/browser';
-import {
-  FaPaperPlane,
-  FaWhatsapp,
-  FaEnvelope,
-  FaInstagram,
-} from 'react-icons/fa';
+import React from 'react';
+import { FaWhatsapp, FaEnvelope, FaInstagram } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import logo from '../assets/logo-global-surgery.png';
+import PdfUploadStandalone from '../components/PdfUploadStandalone';
+
+// Componentes personalizados
+import FormStatus from '../components/FormStatus';
+import SubmitButton from '../components/SubmitButton';
+
+// Custom hook
+import useContactForm from '../hooks/useContactForm';
 
 const ContactPage = () => {
-  const form = useRef();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState({
-    success: false,
-    error: false,
-    message: '',
-  });
-
-  const sendEmail = (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus({ success: false, error: false, message: '' });
-
-    const serviceID = process.env.REACT_APP_EMAILJS_SERVICE_ID;
-    const templateID = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
-    const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
-
-    if (!serviceID || !templateID || !publicKey) {
-      console.error('EmailJS environment variables not configured!');
-      setSubmitStatus({
-        success: false,
-        error: true,
-        message: 'Error de configuración. Intente más tarde.',
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
-    emailjs
-      .sendForm(serviceID, templateID, form.current, publicKey)
-      .then(
-        (result) => {
-          setSubmitStatus({
-            success: true,
-            error: false,
-            message:
-              '¡Mensaje enviado con éxito! Nos pondremos en contacto pronto.',
-          });
-          form.current.reset();
-        },
-        (error) => {
-          setSubmitStatus({
-            success: false,
-            error: true,
-            message: `Error al enviar el mensaje: ${
-              error.text || 'Intente más tarde.'
-            }`,
-          });
-        }
-      )
-      .finally(() => {
-        setIsSubmitting(false);
-      });
-  };
+  const { form, isSubmitting, submitStatus, sendEmail } = useContactForm();
 
   const contactLinkStyle =
     'inline-flex items-center text-gray-600 hover:text-cyan-700 transition-colors duration-200 group text-sm';
 
   return (
     <div className='bg-gradient-to-br from-gray-50 to-blue-50 min-h-[calc(100vh-64px)] py-20 px-4 sm:px-6 lg:px-8 mt-16'>
-      {' '}
       <div className='max-w-6xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden'>
         <div className='grid grid-cols-1 md:grid-cols-2'>
           <div className='p-8 md:p-12 lg:p-16 bg-gray-50 border-r border-gray-200'>
@@ -134,9 +82,10 @@ const ContactPage = () => {
 
           {/* --- Right Column: Form --- */}
           <div className='p-8 md:p-12 lg:p-16 bg-cyan-700'>
-            <h2 className='text-2xl lg:text-3xl font-bold text-gray-900 mb-4'>
+            <h2 className='text-2xl lg:text-3xl font-bold text-cyan-50 mb-4'>
               Formulario
             </h2>
+
             <form
               ref={form}
               onSubmit={sendEmail}
@@ -230,45 +179,13 @@ const ContactPage = () => {
                 />
               </div>
 
+              {/* PDF Upload Section */}
+              <PdfUploadStandalone />
+
               {/* Status Messages & Submit Button */}
               <div className='pt-2'>
-                {submitStatus.success && (
-                  <div
-                    className='bg-green-200 border-l-4 border-green-600 text-green-900 p-4 rounded-md mb-5'
-                    role='alert'
-                  >
-                    <p className='font-medium'>¡Éxito!</p>
-                    <p>{submitStatus.message}</p>
-                  </div>
-                )}
-                {submitStatus.error && (
-                  <div
-                    className='bg-red-200 border-l-4 border-red-600 text-red-900 p-4 rounded-md mb-5'
-                    role='alert'
-                  >
-                    <p className='font-medium'>Error</p>
-                    <p>{submitStatus.message}</p>
-                  </div>
-                )}
-                <button
-                  type='submit'
-                  disabled={isSubmitting}
-                  className={`w-full inline-flex justify-center items-center py-3 px-6 border border-transparent shadow-sm text-base font-semibold rounded-lg transition duration-150 ease-in-out ${
-                    isSubmitting
-                      ? 'bg-gray-400 text-gray-800 cursor-not-allowed'
-                      : 'bg-white text-cyan-700 hover:bg-cyan-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cyan-700 focus:ring-white'
-                  }`}
-                >
-                  {isSubmitting ? (
-                    <svg className='animate-spin -ml-1 mr-3 h-5 w-5 text-cyan-700'></svg>
-                  ) : (
-                    <FaPaperPlane
-                      className='-ml-1 mr-2 h-5 w-5'
-                      aria-hidden='true'
-                    />
-                  )}
-                  {isSubmitting ? 'Enviando...' : 'Enviar Mensaje'}
-                </button>
+                <FormStatus submitStatus={submitStatus} />
+                <SubmitButton isSubmitting={isSubmitting} />
               </div>
             </form>
           </div>

@@ -9,6 +9,7 @@ const productData = [
     systemName: 'URANO',
     systemTitle: 'Sistema de Fijación Pedicular Dorsolumbar',
     systemDescription: 'El sistema URANO ofrece una solución completa y versátil para la fijación pedicular dorsolumbar, diseñado para abordar diversas patologías de la columna con componentes robustos y un instrumental preciso.',
+    previewImage: '/urano/instrumental-a.png',
     components: [
       {
         id: 'urano-poliaxial',
@@ -25,7 +26,7 @@ const productData = [
       {
         id: 'urano-conectores-varios',
         name: 'Conectores del Sistema',
-        image: 'urano/conectores.png', 
+        image: '/urano/conectores.png', 
         altText: 'Conectores Ilíacos, de Barra y DTT del Sistema Urano',
         features: [
           'Conectores Ilíacos para extensión a pelvis.',
@@ -44,15 +45,7 @@ const productData = [
         ],
       },
     ],
-    instrumentation: {
-      title: 'Instrumental Dedicado',
-      description: 'Sets instrumentales completos y organizados para procedimientos eficientes. Incluye Set A (3 niveles), Set B (2 niveles) y Tornillera específica.',
-      images: [
-        { id: 'inst-set-a', src: '/urano/instrumental-a.png', altText: 'Instrumental Urano Set A' },
-        { id: 'inst-set-b', src: '/urano/instrumental-b.png', altText: 'Instrumental Urano Set B' },
-        { id: 'inst-tornillera', src: '/urano/tornillera.png', altText: 'Tornillera Urano' },
-      ]
-    },
+    
     specifications: [
       {
         title: 'Tornillo Poliaxial - Medidas Disponibles',
