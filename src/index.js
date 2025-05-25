@@ -6,7 +6,6 @@ import {
   RouterProvider,
   Outlet,
   useLocation,
-  Navigate
 } from 'react-router-dom';
 
 // Contexto de Autenticación
@@ -51,12 +50,11 @@ const PublicLayout = () => {
 
 const BackofficeLayoutWrapper = () => {
     return (
-        <div className="min-h-screen flex flex-col pt-16"> {/* pt-16 para la navbar fija */}
-            {/* <BackofficeNavbar /> Opcional */}
-            <main className="flex-grow p-4 md:p-8">
+        <div className="min-h-screen flex flex-col pt-16">
+            <Navbar />
+            <main className="flex-grow p-4 md:p-8 bg-gradient-to-r from-gray-50 to-blue-100">
                 <Outlet />
             </main>
-            {/* <BackofficeFooter /> Opcional */}
         </div>
     );
 };
@@ -65,7 +63,7 @@ const BackofficeLayoutWrapper = () => {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <PublicLayout />, // Layout para todas las rutas públicas hijas
+    element: <PublicLayout />, 
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Home /> },
@@ -80,13 +78,9 @@ const router = createBrowserRouter([
     element: <LoginPage />
   },
   {
-    // Ruta base para el backoffice (aún no protegida)
     path: "/backoffice",
     element: <BackofficeLayoutWrapper />, 
     children: [
-      // { index: true, element: <Navigate to="budgets" replace /> }, // Redirige a budgets por defecto
-      // { path: "budgets", element: <BackofficePage /> }, // Descomenta cuando BackofficePage esté lista
-      // Por ahora, para testear, puedes poner un placeholder:
       { index: true, element: <BackofficePage /> }
     ]
   },
@@ -95,9 +89,7 @@ const router = createBrowserRouter([
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
     <AuthProvider> 
       <RouterProvider router={router} />
     </AuthProvider>
-  </React.StrictMode>
 );

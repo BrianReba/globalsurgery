@@ -1,30 +1,98 @@
 // src/pages/backoffice/BackofficePage.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   listBudgets,
   createBudget,
   getBudgetById,
+  deleteBudget,
+  updateBudget,
 } from '../../services/budgetServices';
-
 import { Link } from 'react-router-dom';
+// Import FaMinusCircle for the 'remove line' button
+import {
+  FaEdit,
+  FaTrashAlt,
+  FaFilePdf,
+  FaPlus,
+  FaMinusCircle,
+} from 'react-icons/fa';
+import { generateBudgetPDF } from '../../utils/pdfGenerator';
+import logoImage from '../../assets/logo-global-surgery.png';
+
+// Opciones de IVA (puede estar fuera del componente si no cambian)
+const taxOptions = [
+  { label: 'Exento (0%)', value: 0 },
+  { label: 'IVA (10.5%)', value: 10.5 },
+  { label: 'IVA (21%)', value: 21 },
+];
 
 // Componente para un item de presupuesto en la lista
-const BudgetItem = ({ budget, onSelectBudget }) => (
-  <div
-    className='p-4 border rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer bg-white'
-    onClick={() => onSelectBudget(budget.id)}
-  >
-    <h3 className='font-semibold text-lg text-cyan-700'>
-      Presupuesto ID: {budget.id}
-    </h3>
-    <p className='text-sm text-gray-600'>Cliente: {budget.client_name}</p>
-    <p className='text-sm text-gray-600'>
-      Fecha: {new Date(budget.issue_date).toLocaleDateString()}
-    </p>
-    <p className='text-sm text-gray-600'>
-      Total: ${budget.total_amount?.toFixed(2) || 'N/A'}
-    </p>
+const BudgetItem = ({
+  budget,
+  onSelectBudget,
+  onEdit,
+  onDelete,
+  onDownloadPDF,
+}) => (
+  // Changed padding to px-4 py-6 and added gap-4 to handle spacing within the flex container
+  <div className='flex px-4 py-6 border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 bg-white group gap-4'>
+    {/* Contenido del presupuesto - Ocupa la mayor parte del espacio */}
+    {/* Added min-w-0 to allow content to shrink, removed pr-4 */}
+    <div
+      onClick={() => onSelectBudget(budget.id)}
+      className='cursor-pointer flex-grow min-w-0'
+    >
+      {/* Revised h3 structure to truncate only client name and keep "presupuesto" always visible and aligned */}
+      <h3 className='font-bold text-xl md:text-2xl text-blue-800 flex items-baseline'>
+        <span className='truncate'>{budget.client_name}</span>
+        <span className='text-lg md:text-xl font-normal text-gray-600 ml-1 whitespace-nowrap'>
+          presupuesto
+        </span>
+      </h3>
+      <p className='text-xs text-gray-500 mt-2 font-mono'>ID: {budget.id}</p>
+      <p className='text-sm text-gray-700 mt-3'>
+        Fecha: {new Date(budget.issue_date).toLocaleDateString()}
+      </p>
+      <p className='text-xl text-gray-900 font-extrabold mt-2'>
+        Total: ${parseFloat(budget.total_amount)?.toFixed(2) || 'N/A'}
+      </p>
+    </div>
+
+    {/* Acciones / Iconos - In column on the right */}
+    {/* Removed pl-4 because gap-4 on parent handles spacing */}
+    <div className='flex flex-col space-y-3 justify-center items-center flex-shrink-0'>
+      <button
+        onClick={(e) => {
+          e.stopPropagation(); // Prevents onSelectBudget from triggering
+          onEdit(budget);
+        }}
+        title='Editar Presupuesto'
+        className='text-blue-600 hover:text-blue-700 p-2 rounded-full hover:bg-blue-50 transform hover:scale-110 transition-transform duration-200'
+      >
+        <FaEdit size={20} />
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onDownloadPDF(budget.id);
+        }}
+        title='Descargar PDF'
+        className='text-red-600 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transform hover:scale-110 transition-transform duration-200'
+      >
+        <FaFilePdf size={20} />
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete(budget.id);
+        }}
+        title='Eliminar Presupuesto'
+        className='text-gray-600 hover:text-gray-700 p-2 rounded-full hover:bg-gray-50 transform hover:scale-110 transition-transform duration-200'
+      >
+        <FaTrashAlt size={20} />
+      </button>
+    </div>
   </div>
 );
 
@@ -32,78 +100,115 @@ const BudgetItem = ({ budget, onSelectBudget }) => (
 const BudgetDetailModal = ({ budget, onClose }) => {
   if (!budget) return null;
 
+  // Helper para mostrar el porcentaje de IVA de forma amigable
+  const formatTaxPercentage = (percentageString) => {
+    const percentage = parseFloat(percentageString);
+    if (isNaN(percentage)) return 'N/A';
+    if (percentage === 0) return 'Exento (0%)';
+    return `IVA (${percentage.toFixed(1)}%)`;
+  };
+
+  const parseAndFormatCurrency = (amountString) => {
+    const amount = parseFloat(amountString);
+    return isNaN(amount) ? 'N/A' : `$${amount.toFixed(2)}`;
+  };
+
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
-      <div className='bg-white p-6 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto'>
-        <div className='flex justify-between items-center mb-4'>
-          <h2 className='text-2xl font-bold text-cyan-800'>
-            Detalle Presupuesto ID: {budget.id}
+    <div className='fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50'>
+      <div className='bg-white p-6 rounded-lg shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto'>
+        <div className='flex justify-between items-center pb-4 mb-4 border-b border-gray-200'>
+          <h2 className='text-2xl font-bold text-blue-800'>
+            Detalle Presupuesto:{' '}
+            <span className='font-normal text-gray-800'>
+              {budget.client_name}
+            </span>
           </h2>
           <button
             onClick={onClose}
-            className='text-gray-500 hover:text-gray-700 text-2xl'
+            className='text-gray-600 hover:text-gray-900 text-3xl leading-none font-light p-1 transition-colors'
           >
             ×
           </button>
         </div>
-        <p>
-          <strong>Cliente:</strong> {budget.client_name}
-        </p>
-        <p>
-          <strong>Fecha:</strong>{' '}
-          {new Date(budget.issue_date).toLocaleDateString()}
-        </p>
-        <p className='mt-2'>
-          <strong>Notas:</strong> {budget.notes || 'N/A'}
+        <p className='text-sm text-gray-500 mb-3 font-mono'>ID: {budget.id}</p>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 mb-5 text-gray-700'>
+          <p>
+            <strong>Fecha Emisión:</strong>{' '}
+            {new Date(budget.issue_date).toLocaleDateString()}
+          </p>
+        </div>
+        <p className='mt-2 mb-6 whitespace-pre-wrap break-words text-gray-700'>
+          <strong>Notas / Información de Contacto:</strong>{' '}
+          {budget.notes && budget.notes.trim() !== '' ? budget.notes : 'N/A'}{' '}
         </p>
 
-        <h3 className='text-lg font-semibold mt-6 mb-2 text-gray-700'>
+        <h3 className='text-xl font-semibold mt-6 mb-3 text-blue-700 border-b border-blue-100 pb-2'>
           Líneas del Presupuesto:
         </h3>
-        <div className='overflow-x-auto'>
+        <div className='overflow-x-auto mb-6 border border-gray-200 rounded-md'>
           <table className='min-w-full divide-y divide-gray-200'>
-            <thead className='bg-gray-100'>
+            <thead className='bg-blue-50'>
               <tr>
-                <th className='px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase'>
+                <th className='px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider'>
                   Descripción
                 </th>
-                <th className='px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase'>
+                <th className='px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider'>
                   Cant.
                 </th>
-                <th className='px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase'>
+                <th className='px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider'>
                   P. Unit.
                 </th>
-                <th className='px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase'>
+                <th className='px-4 py-3 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider'>
                   Subtotal
                 </th>
               </tr>
             </thead>
-            <tbody className='bg-white divide-y divide-gray-200'>
+            <tbody className='bg-white divide-y divide-gray-100'>
               {budget.lines?.map((line, index) => (
-                <tr key={index}>
-                  <td className='px-4 py-2 whitespace-nowrap text-sm'>
+                <tr
+                  key={line.id || index}
+                  className={`${
+                    index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                  } hover:bg-blue-50 transition-colors`}
+                >
+                  <td className='px-4 py-2.5 whitespace-nowrap text-sm text-gray-800'>
                     {line.item_description}
                   </td>
-                  <td className='px-4 py-2 whitespace-nowrap text-sm'>
+                  <td className='px-4 py-2.5 whitespace-nowrap text-sm text-center text-gray-700'>
                     {line.quantity}
                   </td>
-                  <td className='px-4 py-2 whitespace-nowrap text-sm'>
-                    ${line.unit_price?.toFixed(2)}
+                  <td className='px-4 py-2.5 whitespace-nowrap text-sm text-right text-gray-700'>
+                    {parseAndFormatCurrency(line.unit_price)}
                   </td>
-                  <td className='px-4 py-2 whitespace-nowrap text-sm'>
-                    ${line.line_total?.toFixed(2)}
+                  <td className='px-4 py-2.5 whitespace-nowrap text-sm text-right text-gray-800 font-medium'>
+                    {parseAndFormatCurrency(line.line_total)}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <p className='text-right font-bold text-xl mt-4 text-gray-800'>
-          Total: ${budget.total_amount?.toFixed(2)}
-        </p>
+
+        <div className='mt-8 pt-5 border-t-2 border-blue-100 space-y-2 text-right'>
+          <p className='text-md text-gray-700'>
+            <strong>Subtotal:</strong>{' '}
+            {parseAndFormatCurrency(budget.subtotal_amount)}
+          </p>
+          <p className='text-md text-gray-700'>
+            <strong>
+              {formatTaxPercentage(budget.applied_tax_percentage)}:
+            </strong>{' '}
+            {parseAndFormatCurrency(budget.tax_amount)}
+          </p>
+          <p className='text-2xl font-extrabold text-blue-800 mt-2'>
+            <strong>Total:</strong>{' '}
+            {parseAndFormatCurrency(budget.total_amount)}
+          </p>
+        </div>
+
         <button
           onClick={onClose}
-          className='mt-6 w-full bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2 px-4 rounded-md transition'
+          className='mt-8 w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-md transition-all shadow-md hover:shadow-lg'
         >
           Cerrar Detalle
         </button>
@@ -112,33 +217,89 @@ const BudgetDetailModal = ({ budget, onClose }) => {
   );
 };
 
+// Nuevo componente para el modal de confirmación
+const ConfirmationModal = ({ isOpen, title, message, onConfirm, onCancel }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
+      <div className='bg-white rounded-lg shadow-xl p-6 max-w-sm w-full'>
+        <h3 className='text-lg font-semibold text-gray-800 mb-4'>{title}</h3>
+        <p className='text-gray-600 mb-6 whitespace-pre-line'>{message}</p>{' '}
+        {/* added whitespace-pre-line for \n */}
+        <div className='flex justify-end space-x-3'>
+          <button
+            onClick={onCancel}
+            className='py-2 px-4 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors'
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            className='py-2 px-4 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors'
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const BackofficePage = () => {
-  const { user, token } = useAuth();
+  const { token } = useAuth();
   const [budgets, setBudgets] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedBudgetDetail, setSelectedBudgetDetail] = useState(null);
+  const [editingBudget, setEditingBudget] = useState(null);
 
-  // Estados para el formulario de creación
   const [clientName, setClientName] = useState('');
-  const [clientEmail, setClientEmail] = useState('');
+  const [appliedTaxPercentage, setAppliedTaxPercentage] = useState(
+    taxOptions[2].value
+  ); // Default a 21%
   const [notes, setNotes] = useState('');
   const [budgetLines, setBudgetLines] = useState([
     { description: '', quantity: 1, unit_price: 0 },
   ]);
 
+  // Estados para el modal de confirmación de eliminación
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [budgetToDeleteId, setBudgetToDeleteId] = useState(null);
+
+  const populateFormForEdit = (budget) => {
+    setClientName(budget.client_name || '');
+    setNotes(budget.notes || '');
+    setAppliedTaxPercentage(
+      parseFloat(budget.applied_tax_percentage) || taxOptions[2].value
+    );
+
+    if (budget.lines && budget.lines.length > 0) {
+      setBudgetLines(
+        budget.lines.map((line) => ({
+          id: line.id, // Keep the ID for updates
+          description: line.item_description || '',
+          quantity: parseFloat(line.quantity) || 1,
+          unit_price: parseFloat(line.unit_price) || 0,
+        }))
+      );
+    } else {
+      setBudgetLines([{ description: '', quantity: 1, unit_price: 0 }]);
+    }
+  };
+
   const fetchBudgets = async () => {
-    if (!token) return; // No hacer fetch si no hay token
+    if (!token) return;
     setIsLoading(true);
     setError('');
     try {
-      const data = await listBudgets(); // El token se añade automáticamente por el interceptor de apiClient
+      const data = await listBudgets();
       setBudgets(data || []);
     } catch (err) {
       setError(
         'Error al cargar los presupuestos: ' +
-          (err.message || 'Error desconocido')
+          (err.response?.data?.error || err.message || 'Error desconocido')
       );
       console.error(err);
     } finally {
@@ -147,8 +308,10 @@ const BackofficePage = () => {
   };
 
   useEffect(() => {
-    fetchBudgets();
-  }, [token]); // Volver a cargar si el token cambia (después del login)
+    if (token) {
+      fetchBudgets();
+    }
+  }, [token]);
 
   const handleAddLine = () => {
     setBudgetLines([
@@ -159,10 +322,10 @@ const BackofficePage = () => {
 
   const handleLineChange = (index, field, value) => {
     const newLines = [...budgetLines];
-    newLines[index][field] = value;
-    // Convertir a número si es cantidad o precio
     if (field === 'quantity' || field === 'unit_price') {
       newLines[index][field] = parseFloat(value) || 0;
+    } else {
+      newLines[index][field] = value;
     }
     setBudgetLines(newLines);
   };
@@ -172,37 +335,51 @@ const BackofficePage = () => {
     setBudgetLines(newLines);
   };
 
-  const handleCreateBudget = async (e) => {
-    e.preventDefault();
-    if (!token) {
-      setError('No autenticado para crear presupuestos.');
-      return;
-    }
+  const resetAndCloseForm = () => {
+    setClientName('');
+    setNotes('');
+    setAppliedTaxPercentage(taxOptions[2].value); // Resetear al valor por defecto 21%
+    setBudgetLines([{ description: '', quantity: 1, unit_price: 0 }]);
+    setShowCreateForm(false);
+    setEditingBudget(null); // Limpiar el estado de edición
+    setError(''); // Limpiar errores del formulario
+  };
+
+  const handleSelectBudget = async (budgetId) => {
+    if (!token) return;
     setIsLoading(true);
     setError('');
     try {
-      const newBudgetData = {
-        client_name: clientName,
-        notes: notes,
-        issue_date: new Date().toISOString().split('T')[0],
-        lines: budgetLines.map((line, index) => ({
-          item_description: line.description,
-          quantity: Number(line.quantity),
-          unit_price: Number(line.unit_price),
-          sort_order:
-            line.sort_order !== undefined ? Number(line.sort_order) : index + 1,
-        })),
-      };
-      await createBudget(newBudgetData);
-      fetchBudgets(); // Recargar lista
-      setShowCreateForm(false);
-      setClientName('');
-      setClientEmail('');
-      setNotes('');
-      setBudgetLines([{ description: '', quantity: 1, unit_price: 0 }]);
+      const budgetDetails = await getBudgetById(budgetId);
+      setSelectedBudgetDetail(budgetDetails);
     } catch (err) {
       setError(
-        'Error al crear el presupuesto: ' + (err.message || 'Error desconocido')
+        'Error al cargar detalle del presupuesto: ' +
+          (err.response?.data?.error || err.message || 'Error desconocido')
+      );
+      console.error(err);
+      setSelectedBudgetDetail(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEditBudget = async (budgetSummary) => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const budgetDetailsToEdit = await getBudgetById(budgetSummary.id);
+      if (budgetDetailsToEdit) {
+        setEditingBudget(budgetDetailsToEdit);
+        populateFormForEdit(budgetDetailsToEdit);
+        setShowCreateForm(true);
+        setSelectedBudgetDetail(null); // Close detail view if open
+      } else {
+        setError('No se pudo cargar el presupuesto para editar.');
+      }
+    } catch (err) {
+      setError(
+        'Error al preparar la edición: ' + (err.message || 'Error desconocido')
       );
       console.error(err);
     } finally {
@@ -210,33 +387,69 @@ const BackofficePage = () => {
     }
   };
 
-  const handleSelectBudget = async (budgetId) => {
-    if (!token) return;
+  // Función para abrir el modal de confirmación de eliminación
+  const handleDeleteBudgetClick = (budgetId) => {
+    setBudgetToDeleteId(budgetId);
+    setIsConfirmModalOpen(true);
+  };
+
+  // Función que se llama cuando el usuario confirma la eliminación en el modal
+  const confirmDeleteBudget = async () => {
+    if (!budgetToDeleteId) return; // Asegurarse de que hay un ID para eliminar
+
     setIsLoading(true);
+    setError('');
+    try {
+      await deleteBudget(budgetToDeleteId);
+      fetchBudgets(); // Recargar la lista de presupuestos
+    } catch (err) {
+      console.error('Error al eliminar el presupuesto:', err);
+      setError(
+        'Error al eliminar el presupuesto: ' +
+          (err.response?.data?.error || err.message || 'Error desconocido')
+      );
+    } finally {
+      setIsLoading(false);
+      setIsConfirmModalOpen(false); // Cerrar el modal
+      setBudgetToDeleteId(null); // Limpiar el ID del presupuesto a eliminar
+    }
+  };
+
+  // Función para cancelar la eliminación desde el modal
+  const cancelDelete = () => {
+    setIsConfirmModalOpen(false);
+    setBudgetToDeleteId(null);
+  };
+
+  const handleDownloadPDF = async (budgetId) => {
+    setIsLoading(true);
+    setError('');
     try {
       const budgetDetails = await getBudgetById(budgetId);
-      setSelectedBudgetDetail(budgetDetails);
+      if (budgetDetails) {
+        generateBudgetPDF(budgetDetails, logoImage);
+      } else {
+        setError(
+          'No se pudieron cargar los detalles del presupuesto para el PDF.'
+        );
+      }
     } catch (err) {
-      setError(
-        'Error al cargar detalle del presupuesto: ' +
-          (err.message || 'Error desconocido')
-      );
+      console.error('Error al generar PDF:', err);
+      setError('Error al generar PDF: ' + (err.message || 'Error desconocido'));
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Si no hay usuario/token, podríamos mostrar un mensaje o redirigir (esto se manejará con ProtectedRoute después)
   if (!token && !isLoading) {
-    // Si isLoading es true, AuthContext aún está cargando
     return (
-      <div className='text-center p-10'>
-        <p className='text-xl text-red-600'>Acceso Denegado.</p>
-        <p>
+      <div className='text-center p-10 bg-gray-50 min-h-screen flex flex-col items-center justify-center'>
+        <p className='text-xl text-red-600 mb-4'>Acceso Denegado.</p>
+        <p className='text-gray-700'>
           Por favor,{' '}
           <Link
             to='/login'
-            className='text-cyan-700 hover:underline'
+            className='text-blue-700 hover:underline font-medium'
           >
             inicie sesión
           </Link>{' '}
@@ -246,49 +459,108 @@ const BackofficePage = () => {
     );
   }
 
+  const handleSubmitBudget = async (e) => {
+    e.preventDefault();
+    if (!token) {
+      setError('No autenticado.');
+      return;
+    }
+    setIsLoading(true);
+    setError('');
+    const budgetPayload = {
+      client_name: clientName,
+      notes: notes,
+      applied_tax_percentage: appliedTaxPercentage,
+      lines: budgetLines.map((line, index) => ({
+        id: line.id, // Important for updating existing lines if they have one
+        item_description: line.description,
+        quantity: Number(line.quantity),
+        unit_price: Number(line.unit_price),
+        sort_order: index + 1,
+      })),
+    };
+    if (!editingBudget) {
+      budgetPayload.issue_date = new Date().toISOString().split('T')[0];
+    }
+
+    try {
+      if (editingBudget) {
+        await updateBudget(editingBudget.id, budgetPayload);
+      } else {
+        await createBudget(budgetPayload);
+      }
+      fetchBudgets();
+      resetAndCloseForm();
+    } catch (err) {
+      setError(
+        `Error al ${editingBudget ? 'actualizar' : 'crear'} el presupuesto: ` +
+          (err.response?.data?.error ||
+            err.response?.data?.errors?.join(', ') ||
+            err.message ||
+            'Error desconocido')
+      );
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className='container mx-auto p-4'>
-      <div className='flex justify-between items-center mb-8'>
-        <h1 className='text-3xl font-bold text-gray-800'>
-          Gestión de Presupuestos - TEST
+    // Degradado de fondo aplicado aquí
+    <div className='container mx-auto p-6 min-h-screen'>
+      <div className='flex justify-between items-center mb-10 pb-4 border-b border-gray-200'>
+        <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900'>
+          {' '}
+          Gestión de Presupuestos
         </h1>
         <button
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          className='bg-cyan-700 hover:bg-cyan-800 text-white font-semibold py-2 px-4 rounded-lg shadow transition'
+          onClick={() => {
+            if (showCreateForm) {
+              resetAndCloseForm();
+            } else {
+              setEditingBudget(null);
+              setShowCreateForm(true);
+            }
+          }}
+          className='bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5'
         >
-          {showCreateForm ? 'Cancelar' : 'Crear Nuevo Presupuesto'}
+          {showCreateForm ? 'Cancelar Creación' : 'Crear Nuevo Presupuesto'}
         </button>
       </div>
 
       {error && (
         <div
-          className='bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded'
+          className='bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md shadow-sm'
           role='alert'
         >
           {error}
         </div>
       )}
+
       {isLoading && !showCreateForm && !selectedBudgetDetail && (
-        <div className='text-center py-4'>Cargando presupuestos...</div>
+        <div className='text-center py-8 text-blue-700 font-medium text-lg'>
+          Cargando presupuestos...
+        </div>
       )}
 
-      {/* Formulario de Creación (Condicional) */}
       {showCreateForm && (
-        <div className='bg-white p-6 md:p-8 rounded-lg shadow-xl mb-10 border border-gray-200'>
-          <h2 className='text-2xl font-semibold text-gray-700 mb-6'>
-            Nuevo Presupuesto
+        <div className='bg-white p-8 rounded-lg shadow-2xl mb-12 border border-gray-200'>
+          <h2 className='text-3xl font-bold text-gray-900 mb-10'>
+            {' '}
+            {editingBudget ? 'Editar Presupuesto' : 'Nuevo Presupuesto'}
           </h2>
           <form
-            onSubmit={handleCreateBudget}
-            className='space-y-6'
+            onSubmit={handleSubmitBudget}
+            className='space-y-8'
           >
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+              {' '}
               <div>
                 <label
                   htmlFor='clientName'
-                  className='block text-sm font-medium text-gray-700 mb-1'
+                  className='block text-sm font-semibold text-gray-800 mb-2'
                 >
-                  Nombre Cliente
+                  Nombre Cliente <span className='text-red-500'>*</span>
                 </label>
                 <input
                   type='text'
@@ -296,149 +568,178 @@ const BackofficePage = () => {
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
                   required
-                  className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500'
+                  placeholder='Ej. Hospital Central'
+                  className='w-full px-4 py-2.5 border border-blue-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400'
                 />
               </div>
               <div>
                 <label
-                  htmlFor='clientEmail'
-                  className='block text-sm font-medium text-gray-700 mb-1'
+                  htmlFor='appliedTax'
+                  className='block text-sm font-semibold text-gray-800 mb-2'
                 >
-                  Email Cliente
+                  IVA Aplicado
                 </label>
-                <input
-                  type='email'
-                  id='clientEmail'
-                  value={clientEmail}
-                  onChange={(e) => setClientEmail(e.target.value)}
-                  required
-                  className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500'
-                />
+                <select
+                  id='appliedTax'
+                  value={appliedTaxPercentage}
+                  onChange={(e) =>
+                    setAppliedTaxPercentage(parseFloat(e.target.value))
+                  }
+                  className='w-full px-4 py-2.5 border border-blue-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 bg-white appearance-none pr-8 cursor-pointer transition-colors duration-200'
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3e%3cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3e%3c/path%3e%3c/svg%3e")`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 0.75rem center',
+                    backgroundSize: '1.5em 1.5em',
+                  }}
+                >
+                  {taxOptions.map((option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
+
             <div>
               <label
                 htmlFor='notes'
-                className='block text-sm font-medium text-gray-700 mb-1'
+                className='block text-sm font-semibold text-gray-800 mb-2'
               >
-                Notas Adicionales
+                Notas | Información de contacto
               </label>
               <textarea
                 id='notes'
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                rows='3'
-                className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500'
+                rows='4'
+                placeholder='Añade detalles relevantes o información de contacto aquí...'
+                className='w-full px-4 py-2.5 border border-blue-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400'
               ></textarea>
             </div>
 
-            <h3 className='text-lg font-medium text-gray-700 pt-4 border-t border-gray-200'>
+            <h3 className='text-2xl font-bold text-blue-700 pt-6 border-t border-blue-100 mb-6'>
+              {' '}
+              {/* Subtítulo más grande y con más espacio */}
               Líneas del Presupuesto
             </h3>
-            {budgetLines.map((line, index) => (
-              <div
-                key={index}
-                className='grid grid-cols-12 gap-4 items-end p-3 bg-gray-50 rounded-md'
-              >
-                <div className='col-span-12 sm:col-span-5'>
-                  <label
-                    htmlFor={`line-desc-${index}`}
-                    className='block text-xs font-medium text-gray-600 mb-1'
-                  >
-                    Descripción
-                  </label>
-                  <input
-                    type='text'
-                    id={`line-desc-${index}`}
-                    value={line.description}
-                    onChange={(e) =>
-                      handleLineChange(index, 'description', e.target.value)
-                    }
-                    required
-                    className='w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm'
-                  />
-                </div>
-                <div className='col-span-6 sm:col-span-2'>
-                  <label
-                    htmlFor={`line-qty-${index}`}
-                    className='block text-xs font-medium text-gray-600 mb-1'
-                  >
-                    Cantidad
-                  </label>
-                  <input
-                    type='number'
-                    id={`line-qty-${index}`}
-                    value={line.quantity}
-                    min='1'
-                    onChange={(e) =>
-                      handleLineChange(index, 'quantity', e.target.value)
-                    }
-                    required
-                    className='w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm'
-                  />
-                </div>
-                <div className='col-span-6 sm:col-span-3'>
-                  <label
-                    htmlFor={`line-price-${index}`}
-                    className='block text-xs font-medium text-gray-600 mb-1'
-                  >
-                    Precio Unit.
-                  </label>
-                  <input
-                    type='number'
-                    id={`line-price-${index}`}
-                    value={line.unit_price}
-                    min='0'
-                    step='0.01'
-                    onChange={(e) =>
-                      handleLineChange(index, 'unit_price', e.target.value)
-                    }
-                    required
-                    className='w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm'
-                  />
-                </div>
-                <div className='col-span-12 sm:col-span-2 flex justify-end'>
-                  {budgetLines.length > 1 && (
-                    <button
-                      type='button'
-                      onClick={() => handleRemoveLine(index)}
-                      className='text-red-500 hover:text-red-700 font-medium text-sm py-1.5 px-2'
+            <div className='space-y-4'>
+              {budgetLines.map((line, index) => (
+                <div
+                  key={line.id || index}
+                  className='grid grid-cols-1 md:grid-cols-12 gap-4 items-end p-4 bg-blue-50 rounded-lg border border-blue-100 shadow-sm'
+                >
+                  <div className='col-span-12 md:col-span-6'>
+                    <label
+                      htmlFor={`line-desc-${index}`}
+                      className='block text-xs font-semibold text-gray-700 mb-1'
                     >
-                      Quitar
-                    </button>
-                  )}
+                      Descripción <span className='text-red-500'>*</span>
+                    </label>
+                    <input
+                      type='text'
+                      id={`line-desc-${index}`}
+                      value={line.description}
+                      onChange={(e) =>
+                        handleLineChange(index, 'description', e.target.value)
+                      }
+                      required
+                      placeholder='Descripción del artículo o servicio'
+                      className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-1 focus:ring-blue-400 focus:border-blue-400'
+                    />
+                  </div>
+                  <div className='col-span-6 md:col-span-2'>
+                    <label
+                      htmlFor={`line-qty-${index}`}
+                      className='block text-xs font-semibold text-gray-700 mb-1'
+                    >
+                      Cantidad <span className='text-red-500'>*</span>
+                    </label>
+                    <input
+                      type='number'
+                      id={`line-qty-${index}`}
+                      value={line.quantity}
+                      min='0.01'
+                      step='any'
+                      onChange={(e) =>
+                        handleLineChange(index, 'quantity', e.target.value)
+                      }
+                      required
+                      className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-1 focus:ring-blue-400 focus:border-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none' // Ocultar flechas de input number
+                    />
+                  </div>
+                  <div className='col-span-6 md:col-span-3'>
+                    <label
+                      htmlFor={`line-price-${index}`}
+                      className='block text-xs font-semibold text-gray-700 mb-1'
+                    >
+                      Precio Unit. <span className='text-red-500'>*</span>
+                    </label>
+                    <input
+                      type='number'
+                      id={`line-price-${index}`}
+                      value={line.unit_price}
+                      min='0'
+                      step='0.01'
+                      onChange={(e) =>
+                        handleLineChange(index, 'unit_price', e.target.value)
+                      }
+                      required
+                      className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-1 focus:ring-blue-400 focus:border-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none' // Ocultar flechas de input number
+                    />
+                  </div>
+                  <div className='col-span-12 md:col-span-1 flex items-center justify-end md:justify-center pt-3 md:pt-0'>
+                    {budgetLines.length > 1 && (
+                      <button
+                        type='button'
+                        onClick={() => handleRemoveLine(index)}
+                        className='text-red-500 hover:text-red-700 p-1.5 rounded-full hover:bg-red-100 transition-colors transform hover:scale-110'
+                        title='Quitar línea'
+                      >
+                        <FaMinusCircle size={20} /> {/* Ícono para quitar */}
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
             <button
               type='button'
               onClick={handleAddLine}
-              className='text-cyan-700 hover:text-cyan-900 font-medium text-sm py-2 px-3 border border-cyan-700 rounded-md hover:bg-cyan-50 transition'
+              className='bg-blue-100 text-blue-700 hover:bg-blue-200 font-semibold text-sm py-2.5 px-4 rounded-md border border-blue-200 shadow-sm hover:shadow-md transition-all duration-200 flex items-center space-x-2'
             >
-              + Añadir Línea
+              <FaPlus size={14} /> {/* Icono de más */}
+              <span>Añadir Línea</span>
             </button>
 
-            <div className='flex justify-end pt-4'>
+            <div className='flex justify-end pt-6 border-t border-gray-200 mt-6'>
               <button
                 type='button'
-                onClick={() => setShowCreateForm(false)}
-                className='mr-3 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50'
+                onClick={resetAndCloseForm}
+                className='mr-4 py-2.5 px-5 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200'
               >
                 Cancelar
               </button>
               <button
                 type='submit'
                 disabled={isLoading}
-                className='py-2 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-700 hover:bg-cyan-800 disabled:bg-gray-400'
+                className='py-2.5 px-6 border border-transparent rounded-md shadow-lg text-base font-medium text-white bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200'
               >
-                {isLoading ? 'Guardando...' : 'Guardar Presupuesto'}
+                {isLoading
+                  ? 'Guardando...'
+                  : editingBudget
+                  ? 'Actualizar Presupuesto'
+                  : 'Guardar Presupuesto'}
               </button>
             </div>
           </form>
         </div>
       )}
 
-      {/* Lista de Presupuestos */}
       {!showCreateForm && budgets.length > 0 && (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
           {budgets.map((budget) => (
@@ -446,20 +747,34 @@ const BackofficePage = () => {
               key={budget.id}
               budget={budget}
               onSelectBudget={handleSelectBudget}
+              onEdit={handleEditBudget}
+              onDelete={handleDeleteBudgetClick}
+              onDownloadPDF={handleDownloadPDF}
             />
           ))}
         </div>
       )}
       {!showCreateForm && !isLoading && budgets.length === 0 && (
-        <div className='text-center py-10 text-gray-500'>
-          No hay presupuestos para mostrar.
+        <div className='text-center py-10 text-gray-500 text-lg'>
+          No hay presupuestos para mostrar. Intenta crear uno.
         </div>
       )}
 
-      {/* Modal de Detalle del Presupuesto */}
       <BudgetDetailModal
         budget={selectedBudgetDetail}
-        onClose={() => setSelectedBudgetDetail(null)}
+        onClose={() => {
+          setSelectedBudgetDetail(null);
+          setError('');
+        }}
+      />
+
+      {/* Modal de confirmación de eliminación */}
+      <ConfirmationModal
+        isOpen={isConfirmModalOpen}
+        title='Confirmar Eliminación'
+        message={`¿Está seguro de que desea eliminar el presupuesto ID: ${budgetToDeleteId}?\n\nEsta acción no se puede deshacer.`}
+        onConfirm={confirmDeleteBudget}
+        onCancel={cancelDelete}
       />
     </div>
   );

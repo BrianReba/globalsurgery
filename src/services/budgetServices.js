@@ -27,3 +27,21 @@ export const getBudgetById = async (budgetId) => {
     throw error.response ? error.response.data : new Error('Error de red o servidor');
   }
 };
+
+export const deleteBudget = async (budgetId) => {
+  try {
+    const response = await apiClient.delete(`/budgets/${budgetId}`);
+    return response.data; // Devuelve el presupuesto detallado
+  } catch (error) {
+    throw error.response ? error.response.data : new Error('Error de red o servidor');
+  }
+};
+
+export const updateBudget = async (budgetId, budgetData) => {
+  try {
+    const response = await apiClient.put(`/budgets/${budgetId}`, budgetData);
+    return response.data; // Devuelve el presupuesto detallado
+  } catch (error) {
+    throw error.response ? error.response.data : new Error('Error de red o servidor');
+  }
+};
