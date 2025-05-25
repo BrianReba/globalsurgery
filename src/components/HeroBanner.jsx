@@ -51,12 +51,12 @@ const HeroBanner = () => {
               </div>
             ))}
           </div>
-          <Link
+          {/* <Link
             to='/services'
             className='mt-5 mb-5 bg-gradient-to-r from-cyan-700 to-cyan-800 hover:bg-cyan-900 text-white font-poppins font-medium py-2 px-6 rounded-lg shadow-lg transition-all duration-300 w-full max-w-md sm:w-auto'
           >
             Conocer nuestros servicios
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>
