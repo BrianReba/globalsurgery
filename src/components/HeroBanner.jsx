@@ -21,7 +21,7 @@ const HeroBanner = () => {
             Especialistas en
           </h2>
           <h1 className='font-playfair text-3xl sm:text-5xl lg:text-6xl text-white font-bold mb-6'>
-            Neurocirugía y Columna
+            Columna y Neurocirugía
           </h1>
 
           {/* Tarjetas de valores - más compactas en móvil */}
@@ -51,12 +51,12 @@ const HeroBanner = () => {
               </div>
             ))}
           </div>
-          {/* <Link
-            to='/services'
+          <Link
+            to='/certificados'
             className='mt-5 mb-5 bg-gradient-to-r from-cyan-700 to-cyan-800 hover:bg-cyan-900 text-white font-poppins font-medium py-2 px-6 rounded-lg shadow-lg transition-all duration-300 w-full max-w-md sm:w-auto'
           >
-            Conocer nuestros servicios
-          </Link> */}
+            Conoce nuestros Certificados
+          </Link>
         </div>
       </div>
     </div>

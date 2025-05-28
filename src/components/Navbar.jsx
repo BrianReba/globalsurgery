@@ -65,14 +65,14 @@ const Navbar = () => {
             >
               Productos
             </Link>
-            {/* <Link
-              to='/services'
+            <Link
+              to='/certificados'
               className={`font-poppins font-medium text-gray-900 hover:text-red-700 transition-all duration-300 ${
                 isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
-              Servicios
-            </Link> */}
+              Certificados
+            </Link>
             <Link
               to='/contact'
               className='font-poppins bg-cyan-800 hover:bg-cyan-900 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300'
@@ -147,13 +147,13 @@ const Navbar = () => {
           >
             Productos
           </Link>
-          {/* <Link
-            to='/services'
+          <Link
+            to='/certificados'
             className='font-poppins text-gray-900 hover:text-red-700 block px-3 py-2 text-base font-medium border-b border-gray-200'
             onClick={() => setIsMenuOpen(false)}
           >
-            Servicios
-          </Link> */}
+            Certificados
+          </Link>
           <Link
             to='/contact'
             className='font-poppins bg-cyan-800 hover:bg-cyan-900 text-white block px-3 py-2 text-base font-medium rounded-lg mx-3 my-2 text-center'

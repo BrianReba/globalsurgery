@@ -98,7 +98,7 @@ const useContactForm = () => {
             });
 
             const pdfEmailParams = {
-                to_email: 'surgery.globalok@gmail.com',
+                to_email: 'ventas@globalsurgery.com.ar',
                 from_name: formData.get('from_name') || 'Formulario de Contacto',
                 subject: `Archivo PDF adjunto de ${formData.get('from_name') || 'un usuario'} (Fallback)`,
                 message: `Archivo PDF adjunto del formulario de contacto.\n\nNombre: ${formData.get('from_name') || 'No especificado'}\nEmail: ${formData.get('from_email') || 'No especificado'}\n\nArchivo: ${pdfFile.name} (${(pdfFile.size/1024).toFixed(1)}KB)`,

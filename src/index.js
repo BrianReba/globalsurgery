@@ -22,6 +22,7 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import PoliticasPage from './pages/PoliticasPage';
 import ContactPage from './pages/ContactFormPage'; 
 import ErrorPage from './pages/ErrorPage';
+import CertificadosPage from './pages/CertificadosPage'
 
 // Páginas de Backoffice/Auth
 import LoginPage from './pages/LoginPage';
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
       { path: "products/:systemId", element: <ProductDetailPage /> },
       { path: "politicas-terminos", element: <PoliticasPage /> },
       { path: "contact", element: <ContactPage /> },
+      { path: "certificados", element: <CertificadosPage /> },
     ]
   },
   {

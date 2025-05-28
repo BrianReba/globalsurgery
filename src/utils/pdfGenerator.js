@@ -2,7 +2,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-// Función para cargar imagen y convertirla a base64 (necesario para jsPDF)
 const imageToBase64 = (url, callback) => {
   const xhr = new XMLHttpRequest();
   xhr.onload = function () {
@@ -22,39 +21,55 @@ export const generateBudgetPDF = (budgetData, logoPath) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
-    const margin = 15; // Margen general
-    let currentY = margin; // Empezamos con el margen superior
+    const margin = 15; 
+    let currentY = margin;
+
+    const drawWatermark = () => {
+      if (logoBase64) {
+        const imgWatermarkProps = doc.getImageProperties(logoBase64);
+        const watermarkWidth = pageWidth * 0.75; 
+        const watermarkHeight = (imgWatermarkProps.height * watermarkWidth) / imgWatermarkProps.width;
+        
+        const watermarkX = (pageWidth - watermarkWidth) / 2;
+        const watermarkY = (pageHeight - watermarkHeight) / 2 + (pageHeight * 0.30); 
+
+        doc.saveGraphicsState();
+        doc.setGState(new doc.GState({opacity: 0.03})); 
+
+        doc.addImage(logoBase64, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+
+        doc.restoreGraphicsState(); 
+      }
+    };
+    drawWatermark();
+
 
     // --- Logo ---
     let logoEndY = currentY;
     if (logoBase64) {
       const imgProps = doc.getImageProperties(logoBase64);
-      const imgWidth = 55; // Aumentamos un poco el ancho del logo
+      const imgWidth = 55;
       const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
       doc.addImage(logoBase64, 'PNG', margin, currentY, imgWidth, imgHeight);
-      logoEndY = currentY + imgHeight; // Guardamos dónde termina el logo
+      logoEndY = currentY + imgHeight;
     }
 
-    // --- Datos de la Empresa y Contacto (A la derecha del logo o debajo si es muy alto) ---
-    const companyDataX = margin + 65; // X para los datos de la empresa, dejando espacio para el logo
-    let companyDataY = margin + 5; // Y inicial para los datos de la empresa
-
+    // --- Datos de la Empresa y Contacto ---
+    const companyDataX = margin + 65;
+    let companyDataY = margin + 5;
     doc.setFontSize(10);
     doc.setFont(undefined, 'bold');
     doc.text("Global Surgery S.A.", companyDataX, companyDataY);
     doc.setFont(undefined, 'normal');
     companyDataY += 5;
-    doc.text("XX-XXXXX-X", companyDataX, companyDataY); 
+    doc.text("30-71794979-6", companyDataX, companyDataY);
     companyDataY += 5;
-    doc.text("Calle falsa 123", companyDataX, companyDataY);
+    doc.text("Av Rivadavia 2431, CABA. Argentina", companyDataX, companyDataY);
     companyDataY += 5;
     doc.text("+54 11 3564-6504", companyDataX, companyDataY);
     companyDataY += 5;
     doc.text("ventas@globalsurgery.com.ar", companyDataX, companyDataY);
-    
-    // Aseguramos que currentY esté debajo tanto del logo como de los datos de la empresa
     currentY = Math.max(logoEndY, companyDataY) + 10;
-
 
     // --- Título del Presupuesto ---
     doc.setFontSize(18);
@@ -67,34 +82,28 @@ export const generateBudgetPDF = (budgetData, logoPath) => {
     doc.setFontSize(10);
     const issueDate = new Date(budgetData.issue_date).toLocaleDateString();
     doc.text(`Cliente: ${budgetData.client_name}`, margin, currentY);
-    doc.text(`Fecha: ${issueDate}`, pageWidth - margin, currentY, { align: 'right' }); 
+    doc.text(`Fecha: ${issueDate}`, pageWidth - margin, currentY, { align: 'right' });
     currentY += 7;
 
     // --- Línea divisoria ---
-    doc.setDrawColor(180); 
+    doc.setDrawColor(180);
     doc.setLineWidth(0.5);
     doc.line(margin, currentY - 3, pageWidth - margin, currentY - 3);
-    currentY += 2; 
+    currentY += 2;
 
-
-    // --- Notas (si existen) ---
-    if (budgetData.notes && budgetData.notes.trim() !== "") { 
+    if (budgetData.notes && budgetData.notes.trim() !== "") {
       doc.setFontSize(10);
       doc.setFont(undefined, 'bold');
       doc.text('Notas Adicionales:', margin, currentY);
       currentY += 5;
       doc.setFont(undefined, 'normal');
-
       const notesText = doc.splitTextToSize(budgetData.notes, pageWidth - (2 * margin));
       doc.text(notesText, margin, currentY);
       currentY += (notesText.length * 4.5) + 8;
     }
 
-
-    // --- Tabla de Líneas del Presupuesto ---
-    const tableColumn = ["Descripción", "Cant.", "P. Unit.", "Subtotal"]; // Acortar "Cantidad"
+    const tableColumn = ["Descripción", "Cant.", "P. Unit.", "Subtotal"];
     const tableRows = [];
-
     budgetData.lines.forEach(line => {
       const lineData = [
         line.item_description,
@@ -105,58 +114,55 @@ export const generateBudgetPDF = (budgetData, logoPath) => {
       tableRows.push(lineData);
     });
 
-    autoTable(doc, { 
+    autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: currentY, 
-      theme: 'grid', // o 'striped'
-      headStyles: { 
-        fillColor: [0, 51, 102], // Azul oscuro corporativo (ejemplo)
-        textColor: [255, 255, 255], // Texto blanco para contraste
+      startY: currentY,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [0, 51, 102],
+        textColor: [255, 255, 255],
         fontStyle: 'bold'
       },
-      styles: { 
-        fontSize: 9, 
-        cellPadding: 2.5, // Un poco más de padding
-        valign: 'middle' 
+      styles: {
+        fontSize: 9,
+        cellPadding: 2.5,
+        valign: 'middle'
       },
       columnStyles: {
-        0: { cellWidth: 'auto', fontStyle: 'normal' }, // Descripción
-        1: { cellWidth: 18, halign: 'right' },  // Cant.
-        2: { cellWidth: 28, halign: 'right' },  // P. Unit.
-        3: { cellWidth: 28, halign: 'right' }   // Subtotal
+        0: { cellWidth: 'auto', fontStyle: 'normal' },
+        1: { cellWidth: 18, halign: 'right' },
+        2: { cellWidth: 28, halign: 'right' },
+        3: { cellWidth: 28, halign: 'right' }
       },
-      didDrawPage: function (data) { 
+      didDrawPage: function (data) {
+        drawWatermark();
+
         doc.setFontSize(8);
-        doc.setTextColor(100); 
+        doc.setTextColor(100);
         doc.text('Página ' + doc.internal.getNumberOfPages(), data.settings.margin.left, pageHeight - 10);
       }
     });
 
-    currentY = doc.lastAutoTable.finalY + 10; 
+    currentY = doc.lastAutoTable.finalY + 10;
 
     // --- Totales ---
     doc.setFontSize(10);
-    const totalsX = pageWidth - margin; 
-
+    const totalsX = pageWidth - margin;
     doc.text(`Subtotal: $${parseFloat(budgetData.subtotal_amount).toFixed(2)}`, totalsX, currentY, { align: 'right' });
     currentY += 6;
-
     const taxPercentage = parseFloat(budgetData.applied_tax_percentage);
     let taxLabel = "Impuesto";
     if (taxPercentage === 0) taxLabel = "Exento (0%)";
     else taxLabel = `IVA (${taxPercentage.toFixed(1)}%)`;
-
     doc.text(`${taxLabel}: $${parseFloat(budgetData.tax_amount).toFixed(2)}`, totalsX, currentY, { align: 'right' });
     currentY += 7;
-
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
     doc.text(`TOTAL: $${parseFloat(budgetData.total_amount).toFixed(2)}`, totalsX, currentY, { align: 'right' });
     doc.setFont(undefined, 'normal');
     currentY += 15;
-  
 
-    doc.save(`Presupuesto-${budgetData.client_name.replace(/\s+/g, '_')}-${budgetData.id.substring(0,8)}.pdf`); 
+    doc.save(`Presupuesto-${budgetData.client_name.replace(/\s+/g, '_')}-${budgetData.id.substring(0,8)}.pdf`);
   });
 };

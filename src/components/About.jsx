@@ -67,7 +67,7 @@ const About = () => {
         numero: '7',
         texto: 'Años de experiencia',
         detalle:
-          'Brindando soluciones innovadoras en neurocirugía y cirugía de columna',
+          'Brindando soluciones innovadoras en cirugía de columna y neurocirugía',
       },
       {
         numero: '254',
@@ -241,8 +241,8 @@ const About = () => {
           </h2>
           <p className='text-white font-poppins text-center text-md'>
             Ser reconocidos globalmente como líderes innovadores en el campo de
-            la neurocirugía y cirugía de columna, marcando un impacto positivo
-            duradero en la atención médica especializada.
+            la cirugía de columna, marcando un impacto positivo duradero en la
+            atención médica especializada.
           </p>
         </div>
       </div>
@@ -359,9 +359,9 @@ const About = () => {
           <div className='md:w-1/2'>
             <p className='font-poppins text-gray-700 mb-8'>
               Estamos listos para atender tus consultas y proporcionar la
-              información que necesitas sobre nuestras soluciones para
-              neurocirugía y cirugía de columna. Nuestro equipo de especialistas
-              está disponible para asesorarte.
+              información que necesitas sobre nuestras soluciones para cirugía
+              de columna. Nuestro equipo de especialistas está disponible para
+              asesorarte.
             </p>
 
             <div className='space-y-4'>

@@ -31,7 +31,7 @@ const Footer = () => {
               />
             </Link>
             <p className='text-sm text-gray-400'>
-              Soluciones avanzadas en neurocirugía y cirugía de columna.
+              Soluciones avanzadas en cirugía de columna y neurocirugía
             </p>
           </div>
 
@@ -56,14 +56,14 @@ const Footer = () => {
                   Productos
                 </Link>
               </li>
-              {/* <li>
+              <li>
                 <Link
-                  to='/services'
+                  to='/certificados'
                   className={linkStyle}
                 >
-                  Servicios
+                  Certificados
                 </Link>
-              </li> */}
+              </li>
               <li>
                 <Link
                   to='/contact'

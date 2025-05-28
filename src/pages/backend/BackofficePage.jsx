@@ -1,5 +1,5 @@
 // src/pages/backoffice/BackofficePage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   listBudgets,
@@ -9,7 +9,6 @@ import {
   updateBudget,
 } from '../../services/budgetServices';
 import { Link } from 'react-router-dom';
-// Import FaMinusCircle for the 'remove line' button
 import {
   FaEdit,
   FaTrashAlt,
@@ -19,8 +18,7 @@ import {
 } from 'react-icons/fa';
 import { generateBudgetPDF } from '../../utils/pdfGenerator';
 import logoImage from '../../assets/logo-global-surgery.png';
-
-// Opciones de IVA (puede estar fuera del componente si no cambian)
+//iva
 const taxOptions = [
   { label: 'Exento (0%)', value: 0 },
   { label: 'IVA (10.5%)', value: 10.5 },
@@ -35,15 +33,11 @@ const BudgetItem = ({
   onDelete,
   onDownloadPDF,
 }) => (
-  // Changed padding to px-4 py-6 and added gap-4 to handle spacing within the flex container
   <div className='flex px-4 py-6 border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 bg-white group gap-4'>
-    {/* Contenido del presupuesto - Ocupa la mayor parte del espacio */}
-    {/* Added min-w-0 to allow content to shrink, removed pr-4 */}
     <div
       onClick={() => onSelectBudget(budget.id)}
       className='cursor-pointer flex-grow min-w-0'
     >
-      {/* Revised h3 structure to truncate only client name and keep "presupuesto" always visible and aligned */}
       <h3 className='font-bold text-xl md:text-2xl text-blue-800 flex items-baseline'>
         <span className='truncate'>{budget.client_name}</span>
         <span className='text-lg md:text-xl font-normal text-gray-600 ml-1 whitespace-nowrap'>
@@ -59,12 +53,10 @@ const BudgetItem = ({
       </p>
     </div>
 
-    {/* Acciones / Iconos - In column on the right */}
-    {/* Removed pl-4 because gap-4 on parent handles spacing */}
     <div className='flex flex-col space-y-3 justify-center items-center flex-shrink-0'>
       <button
         onClick={(e) => {
-          e.stopPropagation(); // Prevents onSelectBudget from triggering
+          e.stopPropagation();
           onEdit(budget);
         }}
         title='Editar Presupuesto'
@@ -96,11 +88,9 @@ const BudgetItem = ({
   </div>
 );
 
-// Componente para el detalle de un presupuesto (modal o sección)
 const BudgetDetailModal = ({ budget, onClose }) => {
   if (!budget) return null;
 
-  // Helper para mostrar el porcentaje de IVA de forma amigable
   const formatTaxPercentage = (percentageString) => {
     const percentage = parseFloat(percentageString);
     if (isNaN(percentage)) return 'N/A';
@@ -217,7 +207,6 @@ const BudgetDetailModal = ({ budget, onClose }) => {
   );
 };
 
-// Nuevo componente para el modal de confirmación
 const ConfirmationModal = ({ isOpen, title, message, onConfirm, onCancel }) => {
   if (!isOpen) return null;
 
@@ -226,7 +215,6 @@ const ConfirmationModal = ({ isOpen, title, message, onConfirm, onCancel }) => {
       <div className='bg-white rounded-lg shadow-xl p-6 max-w-sm w-full'>
         <h3 className='text-lg font-semibold text-gray-800 mb-4'>{title}</h3>
         <p className='text-gray-600 mb-6 whitespace-pre-line'>{message}</p>{' '}
-        {/* added whitespace-pre-line for \n */}
         <div className='flex justify-end space-x-3'>
           <button
             onClick={onCancel}
@@ -264,7 +252,10 @@ const BackofficePage = () => {
     { description: '', quantity: 1, unit_price: 0 },
   ]);
 
-  // Estados para el modal de confirmación de eliminación
+  const [calculatedSubtotal, setCalculatedSubtotal] = useState(0);
+  const [calculatedTaxAmount, setCalculatedTaxAmount] = useState(0);
+  const [calculatedTotal, setCalculatedTotal] = useState(0);
+
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [budgetToDeleteId, setBudgetToDeleteId] = useState(null);
 
@@ -278,10 +269,13 @@ const BackofficePage = () => {
     if (budget.lines && budget.lines.length > 0) {
       setBudgetLines(
         budget.lines.map((line) => ({
-          id: line.id, // Keep the ID for updates
+          id: line.id,
           description: line.item_description || '',
           quantity: parseFloat(line.quantity) || 1,
-          unit_price: parseFloat(line.unit_price) || 0,
+          unit_price:
+            parseFloat(line.unit_price) === 0
+              ? 0
+              : parseFloat(line.unit_price) || '',
         }))
       );
     } else {
@@ -323,7 +317,7 @@ const BackofficePage = () => {
   const handleLineChange = (index, field, value) => {
     const newLines = [...budgetLines];
     if (field === 'quantity' || field === 'unit_price') {
-      newLines[index][field] = parseFloat(value) || 0;
+      newLines[index][field] = value === '' ? '' : parseFloat(value);
     } else {
       newLines[index][field] = value;
     }
@@ -338,11 +332,11 @@ const BackofficePage = () => {
   const resetAndCloseForm = () => {
     setClientName('');
     setNotes('');
-    setAppliedTaxPercentage(taxOptions[2].value); // Resetear al valor por defecto 21%
+    setAppliedTaxPercentage(taxOptions[2].value);
     setBudgetLines([{ description: '', quantity: 1, unit_price: 0 }]);
     setShowCreateForm(false);
-    setEditingBudget(null); // Limpiar el estado de edición
-    setError(''); // Limpiar errores del formulario
+    setEditingBudget(null);
+    setError('');
   };
 
   const handleSelectBudget = async (budgetId) => {
@@ -373,7 +367,7 @@ const BackofficePage = () => {
         setEditingBudget(budgetDetailsToEdit);
         populateFormForEdit(budgetDetailsToEdit);
         setShowCreateForm(true);
-        setSelectedBudgetDetail(null); // Close detail view if open
+        setSelectedBudgetDetail(null);
       } else {
         setError('No se pudo cargar el presupuesto para editar.');
       }
@@ -387,21 +381,19 @@ const BackofficePage = () => {
     }
   };
 
-  // Función para abrir el modal de confirmación de eliminación
   const handleDeleteBudgetClick = (budgetId) => {
     setBudgetToDeleteId(budgetId);
     setIsConfirmModalOpen(true);
   };
 
-  // Función que se llama cuando el usuario confirma la eliminación en el modal
   const confirmDeleteBudget = async () => {
-    if (!budgetToDeleteId) return; // Asegurarse de que hay un ID para eliminar
+    if (!budgetToDeleteId) return;
 
     setIsLoading(true);
     setError('');
     try {
       await deleteBudget(budgetToDeleteId);
-      fetchBudgets(); // Recargar la lista de presupuestos
+      fetchBudgets();
     } catch (err) {
       console.error('Error al eliminar el presupuesto:', err);
       setError(
@@ -410,12 +402,11 @@ const BackofficePage = () => {
       );
     } finally {
       setIsLoading(false);
-      setIsConfirmModalOpen(false); // Cerrar el modal
-      setBudgetToDeleteId(null); // Limpiar el ID del presupuesto a eliminar
+      setIsConfirmModalOpen(false);
+      setBudgetToDeleteId(null);
     }
   };
 
-  // Función para cancelar la eliminación desde el modal
   const cancelDelete = () => {
     setIsConfirmModalOpen(false);
     setBudgetToDeleteId(null);
@@ -440,6 +431,28 @@ const BackofficePage = () => {
       setIsLoading(false);
     }
   };
+
+  const calculateCurrentTotals = useCallback(() => {
+    let currentSubtotal = 0;
+    budgetLines.forEach((line) => {
+      const quantity = parseFloat(line.quantity) || 0;
+      const unitPrice = parseFloat(line.unit_price) || 0;
+      currentSubtotal += quantity * unitPrice;
+    });
+
+    const taxRate = parseFloat(appliedTaxPercentage) || 0;
+    const currentTaxAmount = currentSubtotal * (taxRate / 100);
+    const currentTotal = currentSubtotal + currentTaxAmount;
+
+    setCalculatedSubtotal(currentSubtotal);
+    setCalculatedTaxAmount(currentTaxAmount);
+    setCalculatedTotal(currentTotal);
+  }, [budgetLines, appliedTaxPercentage]);
+
+  // Efecto para recalcular totales cuando cambian las líneas o el porcentaje de IVA
+  useEffect(() => {
+    calculateCurrentTotals();
+  }, [calculateCurrentTotals]);
 
   if (!token && !isLoading) {
     return (
@@ -467,18 +480,22 @@ const BackofficePage = () => {
     }
     setIsLoading(true);
     setError('');
+
+    const sanitizedBudgetLines = budgetLines.map((line) => ({
+      id: line.id,
+      item_description: line.description,
+      quantity: Number(line.quantity) || 0,
+      unit_price: Number(line.unit_price) || 0,
+      sort_order: line.sort_order || 1,
+    }));
+
     const budgetPayload = {
       client_name: clientName,
       notes: notes,
       applied_tax_percentage: appliedTaxPercentage,
-      lines: budgetLines.map((line, index) => ({
-        id: line.id, // Important for updating existing lines if they have one
-        item_description: line.description,
-        quantity: Number(line.quantity),
-        unit_price: Number(line.unit_price),
-        sort_order: index + 1,
-      })),
+      lines: sanitizedBudgetLines,
     };
+
     if (!editingBudget) {
       budgetPayload.issue_date = new Date().toISOString().split('T')[0];
     }
@@ -506,8 +523,7 @@ const BackofficePage = () => {
   };
 
   return (
-    // Degradado de fondo aplicado aquí
-    <div className='container mx-auto p-6 min-h-screen'>
+    <div className='container mx-auto p-6 min-h-screen bg-gradient-to-r from-white to-blue-50'>
       <div className='flex justify-between items-center mb-10 pb-4 border-b border-gray-200'>
         <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900'>
           {' '}
@@ -623,8 +639,6 @@ const BackofficePage = () => {
             </div>
 
             <h3 className='text-2xl font-bold text-blue-700 pt-6 border-t border-blue-100 mb-6'>
-              {' '}
-              {/* Subtítulo más grande y con más espacio */}
               Líneas del Presupuesto
             </h3>
             <div className='space-y-4'>
@@ -669,7 +683,7 @@ const BackofficePage = () => {
                         handleLineChange(index, 'quantity', e.target.value)
                       }
                       required
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-1 focus:ring-blue-400 focus:border-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none' // Ocultar flechas de input number
+                      className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-1 focus:ring-blue-400 focus:border-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                     />
                   </div>
                   <div className='col-span-6 md:col-span-3'>
@@ -689,7 +703,7 @@ const BackofficePage = () => {
                         handleLineChange(index, 'unit_price', e.target.value)
                       }
                       required
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-1 focus:ring-blue-400 focus:border-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none' // Ocultar flechas de input number
+                      className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-1 focus:ring-blue-400 focus:border-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                     />
                   </div>
                   <div className='col-span-12 md:col-span-1 flex items-center justify-end md:justify-center pt-3 md:pt-0'>
@@ -700,7 +714,7 @@ const BackofficePage = () => {
                         className='text-red-500 hover:text-red-700 p-1.5 rounded-full hover:bg-red-100 transition-colors transform hover:scale-110'
                         title='Quitar línea'
                       >
-                        <FaMinusCircle size={20} /> {/* Ícono para quitar */}
+                        <FaMinusCircle size={22} />
                       </button>
                     )}
                   </div>
@@ -712,9 +726,23 @@ const BackofficePage = () => {
               onClick={handleAddLine}
               className='bg-blue-100 text-blue-700 hover:bg-blue-200 font-semibold text-sm py-2.5 px-4 rounded-md border border-blue-200 shadow-sm hover:shadow-md transition-all duration-200 flex items-center space-x-2'
             >
-              <FaPlus size={14} /> {/* Icono de más */}
+              <FaPlus size={14} />
               <span>Añadir Línea</span>
             </button>
+
+            {/* Sección de resumen de cálculo en tiempo real */}
+            <div className='mt-8 pt-6 border-t-2 border-blue-100 space-y-2 text-right'>
+              <p className='text-md text-gray-700'>
+                <strong>Subtotal:</strong> ${calculatedSubtotal.toFixed(2)}
+              </p>
+              <p className='text-md text-gray-700'>
+                <strong>IVA ({appliedTaxPercentage}%):</strong> $
+                {calculatedTaxAmount.toFixed(2)}
+              </p>
+              <p className='text-2xl font-extrabold text-blue-800 mt-2'>
+                <strong>Total Estimado:</strong> ${calculatedTotal.toFixed(2)}
+              </p>
+            </div>
 
             <div className='flex justify-end pt-6 border-t border-gray-200 mt-6'>
               <button
