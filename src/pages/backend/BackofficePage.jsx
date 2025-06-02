@@ -245,8 +245,8 @@ const BackofficePage = () => {
 
   const [clientName, setClientName] = useState('');
   const [appliedTaxPercentage, setAppliedTaxPercentage] = useState(
-    taxOptions[2].value
-  ); // Default a 21%
+    taxOptions[0].value
+  ); // Default a Exento
   const [notes, setNotes] = useState('');
   const [budgetLines, setBudgetLines] = useState([
     { description: '', quantity: 1, unit_price: 0 },
@@ -523,7 +523,7 @@ const BackofficePage = () => {
   };
 
   return (
-    <div className='container mx-auto p-6 min-h-screen bg-gradient-to-r from-white to-blue-50'>
+    <div className='container mx-auto p-6 min-h-screen bg-gradient-to-r from-gray-50 to-blue-100'>
       <div className='flex justify-between items-center mb-10 pb-4 border-b border-gray-200'>
         <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900'>
           {' '}
@@ -553,11 +553,16 @@ const BackofficePage = () => {
         </div>
       )}
 
-      {isLoading && !showCreateForm && !selectedBudgetDetail && (
-        <div className='text-center py-8 text-blue-700 font-medium text-lg'>
-          Cargando presupuestos...
-        </div>
-      )}
+      {isLoading &&
+        !showCreateForm &&
+        !selectedBudgetDetail &&
+        !editingBudget && (
+          <div className='flex flex-col items-center justify-center py-12 space-y-4'>
+            <p className='text-blue-700 font-medium text-lg'>
+              Cargando datos...
+            </p>
+          </div>
+        )}
 
       {showCreateForm && (
         <div className='bg-white p-8 rounded-lg shadow-2xl mb-12 border border-gray-200'>

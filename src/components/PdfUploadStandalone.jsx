@@ -8,7 +8,7 @@ const PdfUploadStandalone = () => {
     message: '',
   });
 
-  const MAX_FILE_SIZE = 150 * 1024; // 150KB en bytes
+  const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1mb
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -38,9 +38,10 @@ const PdfUploadStandalone = () => {
       setUploadStatus({
         success: false,
         error: true,
-        message: `El archivo excede el tamaño máximo permitido de 150KB. Su archivo tiene ${(
-          file.size / 1024
-        ).toFixed(1)}KB.`,
+        message: `El archivo excede el tamaño máximo permitido de 1MB. Su archivo tiene ${(
+          file.size /
+          (1024 * 1024)
+        ).toFixed(2)}MB.`,
       });
       return;
     }
@@ -61,8 +62,7 @@ const PdfUploadStandalone = () => {
         Adjuntar Documento - Receta (opcional)
       </h3>
       <p className='text-sm text-cyan-100 mb-4'>
-        Si lo desea, puede adjuntar un PDF con información adicional (máx.
-        150KB)
+        Si lo desea, puede adjuntar un PDF con información adicional (máx. 1MB)
       </p>
 
       <div className='space-y-4'>

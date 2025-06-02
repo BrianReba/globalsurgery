@@ -39,7 +39,7 @@ const Navbar = () => {
               onClick={handleScrollToTop}
             >
               <img
-                className='h-10 sm:h-12 w-auto transition-all'
+                className='h-14 sm:h-[4.5rem] w-auto transition-all'
                 src={logo}
                 alt='Global Surgery Logo'
               />

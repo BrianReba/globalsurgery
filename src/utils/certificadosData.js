@@ -27,6 +27,14 @@ const certificadosData = [
     numeroExpediente: 'EX-2023-153530835- -APN-DNHFYSF#MS', 
     urlDelPdf: '/certificados/Ministerio_GlobalSurgery.pdf',
     nombreArchivoDescarga: 'GlobalSurgery_Disposicion_Habilitacion_MS.pdf'
+  },
+  {
+    id: 'cadit-membresia',
+    titulo: 'Miembro de CADIT',
+    descripcion: 'Global Surgery es miembro activo de CADIT (Cámara de la Industria Traumatológica), entidad que asegura el acceso a la mejor tecnología médica en implantes y promueve la ética y transparencia en el sector.',
+    isExternalLink: true,
+    urlDelSitio: 'https://www.cadit.com.ar/socios', 
+    logoCaditPath: '/certificados/logo-cadit.png'
   }
 ];
 

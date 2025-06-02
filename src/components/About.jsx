@@ -20,8 +20,6 @@ const About = () => {
   const valorItemRefs = useRef([]);
   const experienciaRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
-
-  // Usar useMemo para evitar la recreación del array en cada render
   const valores = useMemo(
     () => [
       {
@@ -101,15 +99,13 @@ const About = () => {
       if (cardRef && index < valores.length) {
         const valor = valores[index];
 
-        // Aplicar estilos directamente en lugar de usar clases
         cardRef.style.boxShadow = `0 0 15px ${valor.shadowColor}`;
         cardRef.style.borderColor = `rgb(${getBorderColor(valor.color)})`;
 
-        // Quitar el efecto después de un tiempo
         setTimeout(() => {
           if (cardRef) {
             cardRef.style.boxShadow = '';
-            cardRef.style.borderColor = 'rgb(8, 145, 178)'; // Color cyan-700
+            cardRef.style.borderColor = 'rgb(8, 145, 178)';
           }
         }, 800);
       }
@@ -337,9 +333,15 @@ const About = () => {
           </div>
         </div>
       </div>
-
+      <div className='text-center mt-12 mb-8'>
+        <img
+          src='/logo-global-surgery.png'
+          alt='Global Surgery'
+          className='h-52 w-auto mx-auto opacity-90'
+        />
+      </div>
       {/* CTA de contacto */}
-      <div className='w-11/12 mx-auto mt-16 py-12 px-5 bg-white shadow-xl rounded-lg'>
+      <div className='w-11/12 mx-auto py-4 px-5 bg-white shadow-xl rounded-lg'>
         <h2 className='text-center font-poppins text-3xl md:text-4xl font-bold text-gray-900 mb-8 relative'>
           <span className='inline-block relative'>
             Contáctanos

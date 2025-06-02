@@ -73,7 +73,6 @@ const useContactForm = () => {
       const pdfFile = formData.get('pdf_file');
       let pdfInfoHTML = '';
 
-
       if (pdfFile && pdfFile.size > 0) {
         try {
           const cloudinaryResult = await uploadToCloudinary(pdfFile);
@@ -87,44 +86,19 @@ const useContactForm = () => {
             </div>
           `;
         } catch (cloudinaryError) {
-          console.error('Cloudinary upload failed, attempting Base64 fallback or error message:', cloudinaryError);
-          // FALLBACK BASE64
-          try {
-            const fileToBase64 = (file) => new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = (error) => reject(error);
-            });
-
-            const pdfEmailParams = {
-                to_email: 'ventas@globalsurgery.com.ar',
-                from_name: formData.get('from_name') || 'Formulario de Contacto',
-                subject: `Archivo PDF adjunto de ${formData.get('from_name') || 'un usuario'} (Fallback)`,
-                message: `Archivo PDF adjunto del formulario de contacto.\n\nNombre: ${formData.get('from_name') || 'No especificado'}\nEmail: ${formData.get('from_email') || 'No especificado'}\n\nArchivo: ${pdfFile.name} (${(pdfFile.size/1024).toFixed(1)}KB)`,
-                pdf_content: await fileToBase64(pdfFile)
-            };
-            
-            const pdfTemplateID = process.env.REACT_APP_EMAILJS_PDF_TEMPLATE_ID || templateID;
-            await emailjs.send(serviceID, pdfTemplateID, pdfEmailParams, publicKey);
-            pdfInfoHTML = `<p style="margin-top:15px;">Se ha intentado enviar un archivo PDF por separado: ${pdfFile.name} (${(pdfFile.size/1024).toFixed(1)}KB)</p>`;
-          } catch (base64Error) {
-            console.error('Base64 fallback failed:', base64Error);
-            pdfInfoHTML = `<p style="color: red; margin-top:15px;">Hubo un error al subir el archivo adjunto: ${pdfFile.name}. Por favor, contacte al remitente para solicitarlo.</p>`;
-          }
+          console.error('Cloudinary upload failed:', cloudinaryError);
+          pdfInfoHTML = `<p style="color: red; margin-top:15px;">Hubo un error al subir el archivo adjunto: ${pdfFile.name}. Por favor, contacte al remitente para solicitarlo.</p>`;
         }
       }
       
-      const templateParams = {};
-      for (let [key, value] of formData.entries()) {
-        if (key !== 'pdf_file') {
-          templateParams[key] = value;
-        }
-      }
-      
-      templateParams.pdf_info_html = pdfInfoHTML; 
-
-      templateParams.to_email = 'surgery.globalok@gmail.com';
+      const templateParams = {
+        to_email: 'ventas@globalsurgery.com.ar',
+        from_name: formData.get('from_name') || '',
+        from_email: formData.get('from_email') || '',
+        phone: formData.get('phone') || '',
+        message: formData.get('message') || '',
+        pdf_info_html: pdfInfoHTML
+      };
       
       await emailjs.send(serviceID, templateID, templateParams, publicKey);
       

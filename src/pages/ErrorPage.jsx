@@ -41,7 +41,6 @@ const ErrorPage = () => {
         <FaHome className='mr-2' />
         Volver al Inicio
       </Link>
-      {/* BORRAR PARA PRODUCCION*/}
       {process.env.NODE_ENV === 'development' && (
         <pre className='mt-6 text-xs text-left bg-gray-100 p-4 rounded overflow-auto max-w-xl text-red-800'>
           {error instanceof Error
