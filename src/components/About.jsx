@@ -82,7 +82,7 @@ const About = () => {
       },
       {
         icon: <FaUsers className='text-2xl text-white' />,
-        titulo: 'Especialistas neurocirujanos',
+        titulo: 'Cirujanos especializados',
         detalle:
           'Distinguidos profesionales de salud que respaldan nuestras soluciones',
       },
