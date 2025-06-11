@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaWhatsapp, FaEnvelope, FaInstagram } from 'react-icons/fa';
+import {
+  FaWhatsapp,
+  FaEnvelope,
+  FaInstagram,
+  FaPhone,
+  FaMapMarkerAlt,
+} from 'react-icons/fa';
 import logo from '../assets/logo-blanco.png';
-import cadit from '../assets/logo-cadit.png';
+import logoMain from '../assets/logo-global-surgery.png';
+// import cadit from '../assets/logo-cadit.png';
+import MapModal from './MapModal';
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  // reusable
+  const [isMapOpen, setIsMapOpen] = useState(false);
   const linkStyle =
     'text-gray-400 hover:text-white transition-colors duration-200 text-sm';
   const contactLinkStyle = `${linkStyle} inline-flex items-center group`;
@@ -79,7 +87,7 @@ const Footer = () => {
             <h4 className='text-white font-semibold mb-4 tracking-wide'>
               Contacto
             </h4>
-            <ul className='space-y-3'>
+            <ul className='space-y-4'>
               <li>
                 <a
                   href='https://wa.me/541135646504'
@@ -97,6 +105,19 @@ const Footer = () => {
               </li>
               <li>
                 <a
+                  href='tel:541145445527'
+                  className={contactLinkStyle}
+                  aria-label='Llamar a la oficina'
+                >
+                  <FaPhone
+                    size={16}
+                    className='mr-2 flex-shrink-0 group-hover:text-cyan-400'
+                  />
+                  <span>4544-5527</span>
+                </a>
+              </li>
+              <li>
+                <a
                   href='mailto:ventas@globalsurgery.com.ar'
                   className={contactLinkStyle}
                   aria-label='Enviar correo electrónico'
@@ -107,6 +128,21 @@ const Footer = () => {
                   />
                   <span>ventas@globalsurgery.com.ar</span>
                 </a>
+              </li>
+              <li>
+                <button
+                  onClick={() => setIsMapOpen(true)}
+                  className={`${contactLinkStyle} leading-relaxed hover:text-white w-full text-left`}
+                  aria-label='Ver ubicación en el mapa'
+                >
+                  <FaMapMarkerAlt
+                    size={16}
+                    className='mr-2 mt-0.5 flex-shrink-0 text-gray-400 group-hover:text-white'
+                  />
+                  <span className='break-words text-sm group-hover:underline'>
+                    Av Rivadavia 2431, entrada 1 piso 3 oficina 8
+                  </span>
+                </button>
               </li>
             </ul>
           </div>
@@ -142,7 +178,7 @@ const Footer = () => {
               Políticas y Términos
             </Link>
           </div>
-          <a
+          {/* <a
             href='https://www.cadit.com.ar/socios'
             target='_blank'
             rel='noopener noreferrer'
@@ -156,9 +192,31 @@ const Footer = () => {
               width='100'
               height='32'
             />
-          </a>
+          </a> */}
         </div>
       </div>
+
+      {/* Sección de cierre con logo */}
+      <div className='bg-gradient-to-b from-gray-900 via-gray-600 to-gray-500 py-16'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center'>
+          <div className='flex justify-center mb-8'>
+            <img
+              src={logoMain}
+              alt='Global Surgery'
+              className='h-60 w-auto opacity-95 hover:opacity-100 transition-opacity duration-300'
+            />
+          </div>
+          <p className='text-gray-200 text-base max-w-2xl mx-auto leading-relaxed font-medium'>
+            Comprometidos con la excelencia en cirugía de columna y neurocirugía
+          </p>
+        </div>
+      </div>
+
+      {/* Modal del Mapa */}
+      <MapModal
+        isOpen={isMapOpen}
+        onClose={() => setIsMapOpen(false)}
+      />
     </footer>
   );
 };

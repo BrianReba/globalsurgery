@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaPaperPlane } from 'react-icons/fa';
+import { ButtonSpinner } from './LoadingSpinner';
 
 const SubmitButton = ({ isSubmitting }) => {
   return (
@@ -13,7 +14,7 @@ const SubmitButton = ({ isSubmitting }) => {
       }`}
     >
       {isSubmitting ? (
-        <svg className='animate-spin -ml-1 mr-3 h-5 w-5 text-cyan-700'></svg>
+        <ButtonSpinner variant='primary' />
       ) : (
         <FaPaperPlane
           className='-ml-1 mr-2 h-5 w-5'
@@ -25,4 +26,4 @@ const SubmitButton = ({ isSubmitting }) => {
   );
 };
 
-export default SubmitButton; 
+export default SubmitButton;

@@ -8,8 +8,14 @@ import {
   FaWhatsapp,
   FaPhone,
   FaInstagram,
+  FaMapMarkerAlt,
+  FaClock,
+  FaStethoscope,
+  FaUsers,
+  FaMapMarkedAlt,
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import MapModal from './MapModal';
 
 import imagenManos from '../assets/manos.jpg';
 import imagen2 from '../assets/img2.jpg';
@@ -20,6 +26,7 @@ const About = () => {
   const valorItemRefs = useRef([]);
   const experienciaRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isMapOpen, setIsMapOpen] = useState(false);
   const valores = useMemo(
     () => [
       {
@@ -62,28 +69,28 @@ const About = () => {
   const experiencia = useMemo(
     () => [
       {
-        numero: '7',
-        texto: 'Años de experiencia',
+        icon: <FaClock className='text-2xl text-white' />,
+        titulo: 'Más de 10 años de experiencia',
         detalle:
           'Brindando soluciones innovadoras en cirugía de columna y neurocirugía',
       },
       {
-        numero: '254',
-        texto: 'Cirugías asistidas',
+        icon: <FaStethoscope className='text-2xl text-white' />,
+        titulo: 'Cientos de cirugías asistidas',
         detalle:
           'Mejorando la precisión y resultados en procedimientos complejos',
       },
       {
-        numero: '42',
-        texto: 'Especialistas colaboradores',
+        icon: <FaUsers className='text-2xl text-white' />,
+        titulo: 'Especialistas neurocirujanos',
         detalle:
-          'Neurocirujanos y especialistas de salud que respaldan nuestras soluciones',
+          'Distinguidos profesionales de salud que respaldan nuestras soluciones',
       },
       {
-        numero: '8',
-        texto: 'Países con presencia',
+        icon: <FaMapMarkedAlt className='text-2xl text-white' />,
+        titulo: 'Distribución nacional',
         detalle:
-          'Llevando innovación médica a instituciones de salud a todo el continente',
+          'Llevando innovación médica a instituciones de salud por toda la República Argentina',
       },
     ],
     []
@@ -312,20 +319,19 @@ const About = () => {
                     }`}
                     style={{ transitionDelay: `${index * 200}ms` }}
                   >
-                    <div className='flex items-center mb-1'>
-                      <div className='bg-cyan-700 rounded-full h-12 w-12 flex items-center justify-center mr-3'>
-                        <span className='text-xl font-bold text-white'>
-                          {item.numero.split('+')}
-                          <span className='text-sm align-top text-yellow-500'></span>
-                        </span>
+                    <div className='flex items-start mb-1'>
+                      <div className='bg-cyan-700 rounded-full h-12 w-12 flex items-center justify-center mr-3 flex-shrink-0'>
+                        {item.icon}
                       </div>
-                      <h4 className='text-xl font-playfair font-semibold text-white'>
-                        {item.texto}
-                      </h4>
+                      <div className='flex-1 min-w-0'>
+                        <h4 className='text-lg md:text-xl font-playfair font-semibold text-white leading-tight'>
+                          {item.titulo}
+                        </h4>
+                        <p className='text-cyan-100 font-poppins text-sm mt-1 leading-relaxed'>
+                          {item.detalle}
+                        </p>
+                      </div>
                     </div>
-                    <p className='text-cyan-100 ml-18 pl-16 font-poppins text-sm'>
-                      {item.detalle}
-                    </p>
                   </div>
                 ))}
               </div>
@@ -333,15 +339,8 @@ const About = () => {
           </div>
         </div>
       </div>
-      <div className='text-center mt-12 mb-8'>
-        <img
-          src='/logo-global-surgery.png'
-          alt='Global Surgery'
-          className='h-52 w-auto mx-auto opacity-90'
-        />
-      </div>
       {/* CTA de contacto */}
-      <div className='w-11/12 mx-auto py-4 px-5 bg-white shadow-xl rounded-lg'>
+      <div className='w-11/12 mx-auto py-4 px-5 bg-white shadow-xl rounded-lg mt-12'>
         <h2 className='text-center font-poppins text-3xl md:text-4xl font-bold text-gray-900 mb-8 relative'>
           <span className='inline-block relative'>
             Contáctanos
@@ -367,49 +366,68 @@ const About = () => {
             </p>
 
             <div className='space-y-4'>
-              {' '}
-              {/* Phone / WhatsApp Line */}
+              {/* WhatsApp */}
               <a
                 href='https://wa.me/541135646504'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='flex items-center text-gray-700 hover:text-cyan-800 transition-colors duration-200 group'
-                aria-label='Contactar por WhatsApp o llamar al 541135646504'
+                aria-label='Contactar por WhatsApp'
+              >
+                <FaWhatsapp
+                  size={16}
+                  className='text-cyan-700 mr-2 group-hover:text-green-500 transition-colors duration-200'
+                />
+                <span className='font-poppins text-sm group-hover:underline'>
+                  +54 11 3564-6504
+                </span>
+              </a>
+
+              {/* Teléfono Oficina */}
+              <a
+                href='tel:541145445527'
+                className='flex items-center text-gray-700 hover:text-cyan-800 transition-colors duration-200 group'
+                aria-label='Llamar a la oficina'
               >
                 <FaPhone
-                  size={18}
+                  size={16}
                   className='text-cyan-700 mr-2 group-hover:text-cyan-800 transition-colors duration-200'
                 />
-
-                {/* WhatsApp Icon */}
-                <FaWhatsapp
-                  size={18}
-                  className='text-cyan-700 mr-2 group-hover:text-cyan-800 transition-colors duration-200'
-                />
-
-                {/* Phone Number Text */}
-                <span className='font-poppins group-hover:underline'>
-                  {' '}
-                  54 11 3564-6504
+                <span className='font-poppins text-sm group-hover:underline'>
+                  4544-5527
                 </span>
               </a>
-              {/* Email Line */}
+
+              {/* Email */}
               <a
-                href='mailto:ventas@globalsurgery.com'
+                href='mailto:ventas@globalsurgery.com.ar'
                 className='flex items-center text-gray-700 hover:text-cyan-800 transition-colors duration-200 group'
-                aria-label='Enviar correo electrónico a ventas@globalsurgery.com'
+                aria-label='Enviar correo electrónico'
               >
-                {/* Email Icon */}
                 <FaEnvelope
-                  size={18}
-                  className='text-cyan-700 mr-3 group-hover:text-cyan-800 transition-colors duration-200'
+                  size={16}
+                  className='text-cyan-700 mr-2 group-hover:text-cyan-800 transition-colors duration-200'
                 />
-
-                {/* Email Text */}
-                <span className='font-poppins group-hover:underline'>
-                  ventas@globalsurgery.com
+                <span className='font-poppins text-sm group-hover:underline'>
+                  ventas@globalsurgery.com.ar
                 </span>
               </a>
+
+              {/* Ubicación */}
+              <button
+                onClick={() => setIsMapOpen(true)}
+                className='flex items-start text-gray-700 hover:text-cyan-800 transition-colors duration-200 group w-full text-left'
+                aria-label='Ver ubicación en el mapa'
+              >
+                <FaMapMarkerAlt
+                  size={16}
+                  className='text-cyan-700 mr-2 mt-0.5 flex-shrink-0 group-hover:text-cyan-800 transition-colors duration-200'
+                />
+                <span className='font-poppins text-sm leading-relaxed group-hover:underline'>
+                  Av Rivadavia 2431, entrada 1 piso 3 oficina 8
+                </span>
+              </button>
+
               {/* Instagram */}
               <a
                 href='https://www.instagram.com/globalsurgery.ok/'
@@ -419,15 +437,14 @@ const About = () => {
                 aria-label='Visitar nuestro perfil de Instagram'
               >
                 <FaInstagram
-                  size={18}
-                  className='text-cyan-700 mr-3 group-hover:text-cyan-800 transition-colors duration-200'
+                  size={16}
+                  className='text-cyan-700 mr-2 group-hover:text-pink-500 transition-colors duration-200'
                 />
-                <span className='font-poppins group-hover:underline'>
-                  globalsurgery.ok{' '}
+                <span className='font-poppins text-sm group-hover:underline'>
+                  @globalsurgery.ok
                 </span>
               </a>
             </div>
-
             <Link
               to='/contact'
               className='mt-8 bg-gradient-to-r from-cyan-700 to-cyan-600 hover:from-cyan-800 hover:to-cyan-700 text-white py-3 px-6 rounded-md font-semibold shadow-md transition-all duration-300 flex items-center justify-center w-full md:w-auto'
@@ -437,6 +454,12 @@ const About = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal del Mapa */}
+      <MapModal
+        isOpen={isMapOpen}
+        onClose={() => setIsMapOpen(false)}
+      />
     </div>
   );
 };

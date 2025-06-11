@@ -15,6 +15,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
+
 // Páginas Públicas
 import Home from './pages/Home';
 import ProductsPage from './pages/ProductsPage';
@@ -38,13 +39,15 @@ const PublicLayout = () => {
   }, [pathname]);
 
   return (
-    <>
-      <Navbar />
-      <main className="flex-grow">
-        <Outlet />
-      </main>
-      <Footer />
-    </>
+    <div className="relative min-h-screen">
+      <div className="relative z-10">
+        <Navbar />
+        <main className="flex-grow">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
+    </div>
   );
 };
 

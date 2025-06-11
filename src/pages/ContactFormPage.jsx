@@ -1,8 +1,15 @@
-import React from 'react';
-import { FaWhatsapp, FaEnvelope, FaInstagram } from 'react-icons/fa';
+import React, { useState } from 'react';
+import {
+  FaWhatsapp,
+  FaEnvelope,
+  FaInstagram,
+  FaPhone,
+  FaMapMarkerAlt,
+} from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import logo from '../assets/logo-global-surgery.png';
 import PdfUploadStandalone from '../components/PdfUploadStandalone';
+import MapModal from '../components/MapModal';
 
 // Componentes personalizados
 import FormStatus from '../components/FormStatus';
@@ -13,6 +20,7 @@ import useContactForm from '../hooks/useContactForm';
 
 const ContactPage = () => {
   const { form, isSubmitting, submitStatus, sendEmail } = useContactForm();
+  const [isMapOpen, setIsMapOpen] = useState(false);
 
   const contactLinkStyle =
     'inline-flex items-center text-gray-600 hover:text-cyan-700 transition-colors duration-200 group text-sm';
@@ -36,47 +44,90 @@ const ContactPage = () => {
               directamente a través de los siguientes canales.
             </p>
 
-            <div className='space-y-4 border-t border-gray-200 pt-6'>
-              <h3 className='text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3'>
+            <div className='border-t border-gray-200 pt-6'>
+              <h3 className='text-sm font-semibold text-gray-500 uppercase tracking-wider mb-6'>
                 Contacto Directo
               </h3>
-              <a
-                href='https://wa.me/541135646504'
-                target='_blank'
-                rel='noopener noreferrer'
-                className={contactLinkStyle}
-                aria-label='Contactar Principal por WhatsApp'
-              >
-                <FaWhatsapp
-                  size={16}
-                  className='mr-1 flex-shrink-0 text-cyan-600 group-hover:text-cyan-700'
-                />
-                <span className='mr-3'>+54 11 3564-6504</span>
-              </a>
-              <a
-                href='mailto:ventas@globalsurgery.com.ar'
-                className={contactLinkStyle}
-                aria-label='Enviar correo electrónico'
-              >
-                <FaEnvelope
-                  size={16}
-                  className='mr-1 flex-shrink-0 text-cyan-600 group-hover:text-cyan-700'
-                />
-                <span>ventas@globalsurgery.com.ar</span>
-              </a>
-              <a
-                href='https://www.instagram.com/globalsurgery.ok/'
-                target='_blank'
-                rel='noopener noreferrer'
-                className={contactLinkStyle}
-                aria-label='Visitar nuestro perfil de Instagram'
-              >
-                <FaInstagram
-                  size={16}
-                  className='mr-1 flex-shrink-0 text-cyan-600 group-hover:text-cyan-700'
-                />
-                <span className='mr-3'>@globalsurgery.ok</span>
-              </a>
+
+              {/* Teléfonos */}
+              <div className='mb-6'>
+                <a
+                  href='https://wa.me/541135646504'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className={contactLinkStyle}
+                  aria-label='Contactar Principal por WhatsApp'
+                >
+                  <FaWhatsapp
+                    size={16}
+                    className='mr-2 flex-shrink-0 text-cyan-600 group-hover:text-green-500'
+                  />
+                  <span>+54 11 3564-6504</span>
+                </a>
+              </div>
+
+              <div className='mb-6'>
+                <a
+                  href='tel:541145445527'
+                  className={contactLinkStyle}
+                  aria-label='Llamar a la oficina'
+                >
+                  <FaPhone
+                    size={16}
+                    className='mr-2 flex-shrink-0 text-cyan-600 group-hover:text-cyan-700'
+                  />
+                  <span>4544-5527 </span>
+                </a>
+              </div>
+
+              {/* Email */}
+              <div className='mb-6'>
+                <a
+                  href='mailto:ventas@globalsurgery.com.ar'
+                  className={contactLinkStyle}
+                  aria-label='Enviar correo electrónico'
+                >
+                  <FaEnvelope
+                    size={16}
+                    className='mr-2 flex-shrink-0 text-cyan-600 group-hover:text-cyan-700'
+                  />
+                  <span>ventas@globalsurgery.com.ar</span>
+                </a>
+              </div>
+
+              {/* Ubicación */}
+              <div className='mb-6'>
+                <button
+                  onClick={() => setIsMapOpen(true)}
+                  className={`${contactLinkStyle} leading-relaxed hover:text-cyan-700 w-full text-left`}
+                  aria-label='Ver ubicación en el mapa'
+                >
+                  <FaMapMarkerAlt
+                    size={16}
+                    className='mr-2 mt-0.5 flex-shrink-0 text-cyan-600 group-hover:text-cyan-700'
+                  />
+                  <span className='break-words group-hover:underline'>
+                    Av Rivadavia 2431, entrada 1 piso 3 oficina 8
+                  </span>
+                </button>
+              </div>
+
+              {/* Redes Sociales */}
+              <div>
+                <a
+                  href='https://www.instagram.com/globalsurgery.ok/'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className={contactLinkStyle}
+                  aria-label='Visitar nuestro perfil de Instagram'
+                >
+                  <FaInstagram
+                    size={16}
+                    className='mr-2 flex-shrink-0 text-cyan-600 group-hover:text-pink-500'
+                  />
+                  <span>@globalsurgery.ok</span>
+                </a>
+              </div>
             </div>
           </div>
 
@@ -191,6 +242,12 @@ const ContactPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal del Mapa */}
+      <MapModal
+        isOpen={isMapOpen}
+        onClose={() => setIsMapOpen(false)}
+      />
     </div>
   );
 };

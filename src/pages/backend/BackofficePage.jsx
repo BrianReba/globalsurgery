@@ -18,6 +18,7 @@ import {
 } from 'react-icons/fa';
 import { generateBudgetPDF } from '../../utils/pdfGenerator';
 import logoImage from '../../assets/logo-global-surgery.png';
+import { SectionLoader, ButtonSpinner } from '../../components/LoadingSpinner';
 //iva
 const taxOptions = [
   { label: 'Exento (0%)', value: 0 },
@@ -32,12 +33,24 @@ const BudgetItem = ({
   onEdit,
   onDelete,
   onDownloadPDF,
+  downloadingPdf,
+  deletingBudget,
+  selectingBudget,
+  editingBudgetId,
 }) => (
   <div className='flex px-4 py-6 border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 bg-white group gap-4'>
     <div
       onClick={() => onSelectBudget(budget.id)}
-      className='cursor-pointer flex-grow min-w-0'
+      className='cursor-pointer flex-grow min-w-0 relative'
     >
+      {selectingBudget === budget.id && (
+        <div className='absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-lg'>
+          <ButtonSpinner
+            size='md'
+            variant='primary'
+          />
+        </div>
+      )}
       <h3 className='font-bold text-xl md:text-2xl text-blue-800 flex items-baseline'>
         <span className='truncate'>{budget.client_name}</span>
         <span className='text-lg md:text-xl font-normal text-gray-600 ml-1 whitespace-nowrap'>
@@ -59,30 +72,54 @@ const BudgetItem = ({
           e.stopPropagation();
           onEdit(budget);
         }}
+        disabled={editingBudgetId === budget.id}
         title='Editar Presupuesto'
-        className='text-blue-600 hover:text-blue-700 p-2 rounded-full hover:bg-blue-50 transform hover:scale-110 transition-transform duration-200'
+        className='text-blue-600 hover:text-blue-700 p-2 rounded-full hover:bg-blue-50 transform hover:scale-110 transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center'
       >
-        <FaEdit size={20} />
+        {editingBudgetId === budget.id ? (
+          <ButtonSpinner
+            size='sm'
+            variant='primary'
+          />
+        ) : (
+          <FaEdit size={20} />
+        )}
       </button>
       <button
         onClick={(e) => {
           e.stopPropagation();
           onDownloadPDF(budget.id);
         }}
+        disabled={downloadingPdf === budget.id}
         title='Descargar PDF'
-        className='text-red-600 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transform hover:scale-110 transition-transform duration-200'
+        className='text-red-600 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transform hover:scale-110 transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center'
       >
-        <FaFilePdf size={20} />
+        {downloadingPdf === budget.id ? (
+          <ButtonSpinner
+            size='sm'
+            variant='danger'
+          />
+        ) : (
+          <FaFilePdf size={20} />
+        )}
       </button>
       <button
         onClick={(e) => {
           e.stopPropagation();
           onDelete(budget.id);
         }}
+        disabled={deletingBudget === budget.id}
         title='Eliminar Presupuesto'
-        className='text-gray-600 hover:text-gray-700 p-2 rounded-full hover:bg-gray-50 transform hover:scale-110 transition-transform duration-200'
+        className='text-gray-600 hover:text-gray-700 p-2 rounded-full hover:bg-gray-50 transform hover:scale-110 transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center'
       >
-        <FaTrashAlt size={20} />
+        {deletingBudget === budget.id ? (
+          <ButtonSpinner
+            size='sm'
+            variant='secondary'
+          />
+        ) : (
+          <FaTrashAlt size={20} />
+        )}
       </button>
     </div>
   </div>
@@ -238,6 +275,10 @@ const BackofficePage = () => {
   const { token } = useAuth();
   const [budgets, setBudgets] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(null); // ID del presupuesto que se está descargando
+  const [deletingBudget, setDeletingBudget] = useState(null); // ID del presupuesto que se está eliminando
+  const [selectingBudget, setSelectingBudget] = useState(null); // ID del presupuesto que se está seleccionando
+  const [editingBudgetId, setEditingBudgetId] = useState(null); // ID del presupuesto que se está preparando para editar
   const [error, setError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedBudgetDetail, setSelectedBudgetDetail] = useState(null);
@@ -341,7 +382,7 @@ const BackofficePage = () => {
 
   const handleSelectBudget = async (budgetId) => {
     if (!token) return;
-    setIsLoading(true);
+    setSelectingBudget(budgetId);
     setError('');
     try {
       const budgetDetails = await getBudgetById(budgetId);
@@ -354,12 +395,12 @@ const BackofficePage = () => {
       console.error(err);
       setSelectedBudgetDetail(null);
     } finally {
-      setIsLoading(false);
+      setSelectingBudget(null);
     }
   };
 
   const handleEditBudget = async (budgetSummary) => {
-    setIsLoading(true);
+    setEditingBudgetId(budgetSummary.id);
     setError('');
     try {
       const budgetDetailsToEdit = await getBudgetById(budgetSummary.id);
@@ -377,7 +418,7 @@ const BackofficePage = () => {
       );
       console.error(err);
     } finally {
-      setIsLoading(false);
+      setEditingBudgetId(null);
     }
   };
 
@@ -389,7 +430,7 @@ const BackofficePage = () => {
   const confirmDeleteBudget = async () => {
     if (!budgetToDeleteId) return;
 
-    setIsLoading(true);
+    setDeletingBudget(budgetToDeleteId);
     setError('');
     try {
       await deleteBudget(budgetToDeleteId);
@@ -401,7 +442,7 @@ const BackofficePage = () => {
           (err.response?.data?.error || err.message || 'Error desconocido')
       );
     } finally {
-      setIsLoading(false);
+      setDeletingBudget(null);
       setIsConfirmModalOpen(false);
       setBudgetToDeleteId(null);
     }
@@ -413,7 +454,7 @@ const BackofficePage = () => {
   };
 
   const handleDownloadPDF = async (budgetId) => {
-    setIsLoading(true);
+    setDownloadingPdf(budgetId);
     setError('');
     try {
       const budgetDetails = await getBudgetById(budgetId);
@@ -428,7 +469,7 @@ const BackofficePage = () => {
       console.error('Error al generar PDF:', err);
       setError('Error al generar PDF: ' + (err.message || 'Error desconocido'));
     } finally {
-      setIsLoading(false);
+      setDownloadingPdf(null);
     }
   };
 
@@ -556,13 +597,7 @@ const BackofficePage = () => {
       {isLoading &&
         !showCreateForm &&
         !selectedBudgetDetail &&
-        !editingBudget && (
-          <div className='flex flex-col items-center justify-center py-12 space-y-4'>
-            <p className='text-blue-700 font-medium text-lg'>
-              Cargando datos...
-            </p>
-          </div>
-        )}
+        !editingBudget && <SectionLoader text='Cargando presupuestos...' />}
 
       {showCreateForm && (
         <div className='bg-white p-8 rounded-lg shadow-2xl mb-12 border border-gray-200'>
@@ -760,8 +795,9 @@ const BackofficePage = () => {
               <button
                 type='submit'
                 disabled={isLoading}
-                className='py-2.5 px-6 border border-transparent rounded-md shadow-lg text-base font-medium text-white bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200'
+                className='py-2.5 px-6 border border-transparent rounded-md shadow-lg text-base font-medium text-white bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center gap-2'
               >
+                {isLoading && <ButtonSpinner />}
                 {isLoading
                   ? 'Guardando...'
                   : editingBudget
@@ -783,6 +819,10 @@ const BackofficePage = () => {
               onEdit={handleEditBudget}
               onDelete={handleDeleteBudgetClick}
               onDownloadPDF={handleDownloadPDF}
+              downloadingPdf={downloadingPdf}
+              deletingBudget={deletingBudget}
+              selectingBudget={selectingBudget}
+              editingBudgetId={editingBudgetId}
             />
           ))}
         </div>

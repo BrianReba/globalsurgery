@@ -1,6 +1,7 @@
 import { useParams, Link, Navigate } from 'react-router-dom';
 import productData from '../utils/productData';
 import { useState, useEffect } from 'react';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const SpecificationTable = ({ title, headers, rows, note }) => (
   <div className='mb-8 overflow-hidden'>
@@ -129,7 +130,10 @@ const ProductDetailPage = () => {
                     <div className='flex justify-center relative'>
                       {isLoading && (
                         <div className='absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg'>
-                          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-700'></div>
+                          <LoadingSpinner
+                            size='lg'
+                            variant='primary'
+                          />
                         </div>
                       )}
                       <img

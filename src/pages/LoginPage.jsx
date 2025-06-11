@@ -3,6 +3,7 @@ import { useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { login as loginService } from '../services/authServices';
 import logo from '../assets/logo-global-surgery.png';
+import { ButtonSpinner } from '../components/LoadingSpinner';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -130,13 +131,10 @@ const LoginPage = () => {
               <button
                 type='submit'
                 disabled={isLoading}
-                className='group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-cyan-700 hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:bg-gray-400 disabled:opacity-70 transition-all duration-150 ease-in-out'
+                className='group relative w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-cyan-700 hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:bg-gray-400 disabled:opacity-70 transition-all duration-150 ease-in-out'
               >
-                {isLoading ? (
-                  <svg className='animate-spin h-5 w-5 text-white'></svg>
-                ) : (
-                  'Ingresar'
-                )}
+                {isLoading && <ButtonSpinner variant='white' />}
+                {isLoading ? 'Iniciando sesión...' : 'Ingresar'}
               </button>
             </div>
           </form>
