@@ -10,7 +10,9 @@ import {
 import logo from '../assets/logo-blanco.png';
 import logoMain from '../assets/logo-global-surgery.png';
 // import cadit from '../assets/logo-cadit.png';
+import pistech from '../assets/pistech-nobg.png';
 import MapModal from './MapModal';
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [isMapOpen, setIsMapOpen] = useState(false);
@@ -19,6 +21,10 @@ const Footer = () => {
   const contactLinkStyle = `${linkStyle} inline-flex items-center group`;
   const socialIconStyle =
     'text-gray-400 hover:text-white transition-colors duration-200';
+
+  const whatsappMessage = encodeURIComponent(
+    'Hola Pistech, me comunico a través de la web de global, estoy interesado en sus servicios'
+  );
 
   return (
     <footer className='bg-gray-900 text-gray-300'>
@@ -177,6 +183,23 @@ const Footer = () => {
             >
               Políticas y Términos
             </Link>
+          </div>
+
+          <div className=' mt-4 sm:mt-0 font-semibold'>
+            <a
+              href={`https://wa.me/TUNUMERODEWHATSAPP?text=${whatsappMessage}`}
+              target='_blank'
+              rel='noopener noreferrer'
+              aria-label='Contactar a Pistech por WhatsApp'
+              className='flex items-center group'
+            >
+              <span className='text-xs text-gray-500 mr-1 group-hover:text-gray-300 transition-colors duration-200'>
+                Desarrollado por PISTECH
+              </span>
+              <span className='text-xs text-gray-500  group-hover:text-gray-300 transition-colors duration-200'>
+                con ❤️
+              </span>
+            </a>
           </div>
           {/* <a
             href='https://www.cadit.com.ar/socios'
