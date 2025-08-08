@@ -10,7 +10,7 @@ import {
 import logo from '../assets/logo-blanco.png';
 import logoMain from '../assets/logo-global-surgery.png';
 // import cadit from '../assets/logo-cadit.png';
-import pistech from '../assets/pistech-nobg.png';
+// import pistech from '../assets/pistech-nobg.png';
 import MapModal from './MapModal';
 
 const Footer = () => {
@@ -185,9 +185,9 @@ const Footer = () => {
             </Link>
           </div>
 
-          <div className=' mt-4 sm:mt-0 font-semibold'>
+          <div className='mt-4 sm:mt-0 font-semibold'>
             <a
-              href={`https://wa.me/TUNUMERODEWHATSAPP?text=${whatsappMessage}`}
+              href={`https://wa.me/+5491138207230?text=${whatsappMessage}`}
               target='_blank'
               rel='noopener noreferrer'
               aria-label='Contactar a Pistech por WhatsApp'
