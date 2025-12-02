@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
 import emailjs from '@emailjs/browser';
+import { toast } from 'react-toastify';
+import { validateEmail, validatePhone, sanitizeInput } from '../utils/formValidation';
 
 const useContactForm = () => {
   const form = useRef();
@@ -9,34 +11,35 @@ const useContactForm = () => {
     error: false,
     message: '',
   });
+  const [formLoadTime] = useState(Date.now());
 
   const uploadToCloudinary = async (file) => {
     const cloudName = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
     const uploadPreset = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
-    
+
     if (!cloudName || !uploadPreset) {
       console.error('Cloudinary environment variables not configured');
       throw new Error('Cloudinary configuration not available');
     }
-    
+
     const cloudinaryData = new FormData();
     cloudinaryData.append('file', file);
     cloudinaryData.append('upload_preset', uploadPreset);
     cloudinaryData.append('folder', 'global_surgery');
-    
+
     try {
       const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
       const response = await fetch(cloudinaryUrl, {
         method: 'POST',
         body: cloudinaryData,
       });
-      
+
       if (!response.ok) {
         const errorData = await response.text();
         console.error('Cloudinary error response:', errorData);
         throw new Error(`Error uploading to Cloudinary: ${response.statusText}`);
       }
-      
+
       const cloudinaryResponse = await response.json();
       return {
         url: cloudinaryResponse.secure_url,
@@ -49,8 +52,77 @@ const useContactForm = () => {
     }
   };
 
+  // Rate Limiting Helpers (localStorage)
+  const getSubmitCount = () => {
+    const data = localStorage.getItem('contactFormSubmits');
+    if (!data) return 0;
+
+    const { count, timestamp } = JSON.parse(data);
+    const hourAgo = Date.now() - 3600000; // 1 hora
+
+    if (timestamp < hourAgo) {
+      localStorage.removeItem('contactFormSubmits');
+      return 0;
+    }
+
+    return count;
+  };
+
+  const incrementSubmitCount = () => {
+    const current = getSubmitCount();
+    localStorage.setItem('contactFormSubmits', JSON.stringify({
+      count: current + 1,
+      timestamp: Date.now()
+    }));
+  };
+
   const sendEmail = async (e) => {
     e.preventDefault();
+
+    const formData = new FormData(form.current);
+
+    // 1. Rate Limiting Check
+    const submitCount = getSubmitCount();
+    if (submitCount >= 3) {
+      toast.error('Has alcanzado el límite de envíos. Intenta en 1 hora.');
+      return;
+    }
+
+    // 2. Time-based validation (min 3 segundos desde carga)
+    const timeSinceLoad = Date.now() - formLoadTime;
+    if (timeSinceLoad < 3000) {
+      toast.error('Por favor completa el formulario correctamente.');
+      return;
+    }
+
+    // 3. Honeypot check
+    const honeypot = formData.get('website');
+    if (honeypot) {
+      console.log('Bot detected');
+      return; // Silent fail para bots
+    }
+
+    // 4. Field validations
+    const name = sanitizeInput(formData.get('from_name'));
+    const email = formData.get('from_email');
+    const phone = formData.get('phone');
+    const message = sanitizeInput(formData.get('message'));
+
+    if (!validateEmail(email)) {
+      toast.error('Email inválido');
+      return;
+    }
+
+    if (phone && !validatePhone(phone)) {
+      toast.error('Teléfono inválido. Usa formato: +54 11 1234-5678');
+      return;
+    }
+
+    if (message.length < 10 || message.length > 1000) {
+      toast.error('El mensaje debe tener entre 10 y 1000 caracteres');
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitStatus({ success: false, error: false, message: '' });
 
@@ -59,17 +131,12 @@ const useContactForm = () => {
     const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
 
     if (!serviceID || !templateID || !publicKey) {
-      setSubmitStatus({
-        success: false,
-        error: true,
-        message: 'Error de configuración. Intente más tarde.',
-      });
+      toast.error('Error de configuración. Intente más tarde.');
       setIsSubmitting(false);
       return;
     }
 
     try {
-      const formData = new FormData(form.current);
       const pdfFile = formData.get('pdf_file');
       let pdfInfoHTML = '';
 
@@ -90,26 +157,40 @@ const useContactForm = () => {
           pdfInfoHTML = `<p style="color: red; margin-top:15px;">Hubo un error al subir el archivo adjunto: ${pdfFile.name}. Por favor, contacte al remitente para solicitarlo.</p>`;
         }
       }
-      
+
       const templateParams = {
         to_email: 'ventas@globalsurgery.com.ar',
-        from_name: formData.get('from_name') || '',
-        from_email: formData.get('from_email') || '',
-        phone: formData.get('phone') || '',
-        message: formData.get('message') || '',
+        from_name: name,
+        from_email: email,
+        phone: phone || '',
+        message: message,
         pdf_info_html: pdfInfoHTML
       };
-      
+
       await emailjs.send(serviceID, templateID, templateParams, publicKey);
-      
+
+      // Éxito
+      toast.success('¡Mensaje enviado con éxito! Nos contactaremos pronto.', {
+        position: 'top-center',
+        autoClose: 5000,
+      });
+      incrementSubmitCount();
+      form.current.reset();
+
       setSubmitStatus({
         success: true,
         error: false,
         message: '¡Mensaje enviado con éxito! Nos pondremos en contacto pronto.',
       });
-      form.current.reset();
     } catch (error) {
       console.error('Error sending email:', error);
+
+      // Error
+      toast.error(`Error: ${error.text || 'Intenta más tarde'}`, {
+        position: 'top-center',
+        autoClose: 7000,
+      });
+
       setSubmitStatus({
         success: false,
         error: true,

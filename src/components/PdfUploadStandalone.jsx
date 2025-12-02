@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 
 const PdfUploadStandalone = () => {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadStatus, setUploadStatus] = useState({
-    success: false,
-    error: false,
-    message: '',
-  });
 
   const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1mb
 
@@ -15,45 +11,27 @@ const PdfUploadStandalone = () => {
 
     if (!file) {
       setSelectedFile(null);
-      setUploadStatus({
-        success: false,
-        error: false,
-        message: '',
-      });
       return;
     }
 
     if (file.type !== 'application/pdf') {
       setSelectedFile(null);
-      setUploadStatus({
-        success: false,
-        error: true,
-        message: 'Por favor seleccione un archivo PDF válido.',
-      });
+      toast.error('Por favor seleccione un archivo PDF válido.');
+      // Reset input
+      e.target.value = '';
       return;
     }
 
     if (file.size > MAX_FILE_SIZE) {
       setSelectedFile(null);
-      setUploadStatus({
-        success: false,
-        error: true,
-        message: `El archivo excede el tamaño máximo permitido de 1MB. Su archivo tiene ${(
-          file.size /
-          (1024 * 1024)
-        ).toFixed(2)}MB.`,
-      });
+      toast.error(`El archivo excede el tamaño máximo de 1MB. Tu archivo: ${(file.size/1024/1024).toFixed(2)}MB`);
+      // Reset input
+      e.target.value = '';
       return;
     }
 
     setSelectedFile(file);
-    setUploadStatus({
-      success: true,
-      error: false,
-      message: `Archivo "${file.name}" (${(file.size / 1024).toFixed(
-        1
-      )}KB) seleccionado. Se enviará junto con el formulario.`,
-    });
+    toast.success(`PDF "${file.name}" cargado correctamente`);
   };
 
   return (
@@ -83,21 +61,9 @@ const PdfUploadStandalone = () => {
           />
         </div>
 
-        {uploadStatus.error && (
-          <div
-            className='bg-red-100 border-l-4 border-red-500 text-red-700 p-3 rounded'
-            role='alert'
-          >
-            <p>{uploadStatus.message}</p>
-          </div>
-        )}
-
-        {uploadStatus.success && (
-          <div
-            className='bg-green-100 border-l-4 border-green-500 text-green-700 p-3 rounded'
-            role='alert'
-          >
-            <p>{uploadStatus.message}</p>
+        {selectedFile && (
+          <div className='bg-green-100 border-l-4 border-green-500 text-green-700 p-3 rounded' role='alert'>
+            <p>Archivo seleccionado: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)}KB)</p>
           </div>
         )}
       </div>

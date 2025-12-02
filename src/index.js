@@ -30,6 +30,7 @@ import LoginPage from './pages/LoginPage';
 import BackofficePage from './pages/backend/BackofficePage';
 
 import './index.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Layout para las rutas públicas
 const PublicLayout = () => {

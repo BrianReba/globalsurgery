@@ -6,7 +6,8 @@ import {
   FaPhone,
   FaMapMarkerAlt,
 } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import logo from '../assets/logo-global-surgery.png';
 import PdfUploadStandalone from '../components/PdfUploadStandalone';
 import MapModal from '../components/MapModal';
@@ -21,6 +22,7 @@ import useContactForm from '../hooks/useContactForm';
 const ContactPage = () => {
   const { form, isSubmitting, submitStatus, sendEmail } = useContactForm();
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [messageLength, setMessageLength] = useState(0);
 
   const contactLinkStyle =
     'inline-flex items-center text-gray-600 hover:text-cyan-700 transition-colors duration-200 group text-sm';
@@ -156,8 +158,10 @@ const ContactPage = () => {
                     name='from_name'
                     id='from_name'
                     required
+                    minLength={2}
+                    maxLength={100}
                     className='block w-full px-4 py-3 border border-cyan-500 bg-white text-gray-900 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cyan-700 focus:ring-white sm:text-sm transition'
-                    placeholder='Tu nombre completo'
+                    placeholder='Juan Pérez'
                   />
                 </div>
                 <div>
@@ -172,8 +176,9 @@ const ContactPage = () => {
                     name='from_email'
                     id='from_email'
                     required
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                     className='block w-full px-4 py-3 border border-cyan-500 bg-white text-gray-900 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cyan-700 focus:ring-white sm:text-sm transition'
-                    placeholder='tu@email.com'
+                    placeholder='juan@ejemplo.com'
                   />
                 </div>
               </div>
@@ -191,8 +196,9 @@ const ContactPage = () => {
                     type='tel'
                     name='phone'
                     id='phone'
+                    pattern="[\+]?[0-9\s\-\(\)]+"
                     className='block w-full px-4 py-3 border border-cyan-500 bg-white text-gray-900 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cyan-700 focus:ring-white sm:text-sm transition'
-                    placeholder='+54 11 ...'
+                    placeholder='+54 11 1234-5678'
                   />
                 </div>
                 <div>
@@ -212,6 +218,20 @@ const ContactPage = () => {
                 </div>
               </div>
 
+              {/* Honeypot field - hidden from users, visible to bots */}
+              <input
+                type='text'
+                name='website'
+                tabIndex='-1'
+                autoComplete='off'
+                style={{
+                  position: 'absolute',
+                  left: '-9999px',
+                  width: '1px',
+                  height: '1px'
+                }}
+              />
+
               {/* Message Field */}
               <div>
                 <label
@@ -224,10 +244,16 @@ const ContactPage = () => {
                   name='message'
                   id='message'
                   required
+                  minLength={10}
+                  maxLength={1000}
                   rows={5}
                   className='block w-full px-4 py-3 border border-cyan-500 bg-white text-gray-900 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cyan-700 focus:ring-white sm:text-sm transition'
-                  placeholder='Escribe tu consulta aquí...'
+                  placeholder='Describe tu consulta aquí...'
+                  onChange={(e) => setMessageLength(e.target.value.length)}
                 />
+                <div className='text-right text-sm text-cyan-200 mt-1'>
+                  {messageLength}/1000 caracteres
+                </div>
               </div>
 
               {/* PDF Upload Section */}
@@ -247,6 +273,20 @@ const ContactPage = () => {
       <MapModal
         isOpen={isMapOpen}
         onClose={() => setIsMapOpen(false)}
+      />
+
+      {/* Toast container for notifications */}
+      <ToastContainer
+        position='top-center'
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme='colored'
       />
     </div>
   );
