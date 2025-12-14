@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo-global-surgery.png';
+// NAVIDAD - Remover después de temporada
+import logo from '../assets/logo-navidad.svg';
 import { useLocation } from 'react-router-dom';
 
 const Navbar = () => {

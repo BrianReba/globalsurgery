@@ -15,6 +15,9 @@ import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
+// NAVIDAD - Remover después de temporada
+import Snowfall from 'react-snowfall';
+
 
 // Páginas Públicas
 import Home from './pages/Home';
@@ -41,6 +44,17 @@ const PublicLayout = () => {
 
   return (
     <div className="relative min-h-screen">
+      {/* NAVIDAD - Remover después de temporada */}
+      <Snowfall
+        snowflakeCount={80}
+        style={{
+          position: 'fixed',
+          width: '100vw',
+          height: '100vh',
+          zIndex: 9999,
+          pointerEvents: 'none'
+        }}
+      />
       <div className="relative z-10">
         <Navbar />
         <main className="flex-grow">

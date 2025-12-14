@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import primeraImagen from '../assets/img1.jpg';
-import logoGlobalSurgery from '../assets/logo-global-surgery.png';
+// NAVIDAD - Remover después de temporada
+import logoGlobalSurgery from '../assets/logo-navidad.svg';
+// NAVIDAD - Remover después de temporada
+import ChristmasStars from './seasonal/ChristmasStars';
 
 const HeroBanner = () => {
   return (
@@ -12,6 +15,8 @@ const HeroBanner = () => {
         style={{ backgroundImage: `url(${primeraImagen})` }}
       >
         <div className='absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-blue-900/30 to-teal-800/20'></div>
+        {/* NAVIDAD - Estrellitas decorativas - Remover después de temporada */}
+        <ChristmasStars variant='hero' />
         <div className='absolute bottom-6 right-6 z-5 opacity-25 hover:opacity-50 transition-opacity duration-300'>
           <img
             src={logoGlobalSurgery}
@@ -23,11 +28,17 @@ const HeroBanner = () => {
           <h2 className='text-xl sm:text-3xl lg:text-3xl font-medium text-white/90 font-poppins mb-1 sm:mb-2 mt-2 drop-shadow-lg animate-fade-in-up'>
             Especialistas en
           </h2>
-          <h1 className='font-playfair text-3xl sm:text-5xl lg:text-6xl text-white/90 font-semibold mb-8 drop-shadow-lg animate-fade-in-up animation-delay-200'>
+          <h1 className='font-playfair text-3xl sm:text-5xl lg:text-6xl text-white/90 font-semibold mb-4 drop-shadow-lg animate-fade-in-up animation-delay-200'>
             Columna y Neurocirugía
           </h1>
+          {/* NAVIDAD - Remover después de temporada */}
+          <div className='mb-3 animate-fade-in-up animation-delay-400'>
+            <span className='inline-block px-6 py-2 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-white font-poppins font-semibold text-lg sm:text-xl rounded-full shadow-lg border border-yellow-300/50 tracking-wide drop-shadow-md'>
+              🎄 ¡Felices Fiestas! 🎄
+            </span>
+          </div>
           {/* Tarjetas de valores minimalistas */}
-          <div className='flex flex-col gap-4 sm:gap-6 w-full max-w-md sm:max-w-4xl mx-auto'>
+          <div className='flex flex-col gap-1 sm:gap-6 w-full max-w-md sm:max-w-4xl mx-auto'>
             {[
               {
                 title: 'Excelencia',
@@ -64,7 +75,7 @@ const HeroBanner = () => {
           </div>
           <Link
             to='/certificados'
-            className='mt-8 mb-5 bg-cyan-700 hover:bg-cyan-800 text-white font-poppins font-medium py-3 px-8 rounded-lg shadow-lg transition-all duration-300 w-full max-w-md sm:w-auto drop-shadow-lg hover:scale-105 animate-fade-in-up animation-delay-1800'
+            className='mt-5 mb-5 bg-cyan-700 hover:bg-cyan-800 text-white font-poppins font-medium py-3 px-8 rounded-lg shadow-lg transition-all duration-300 w-full max-w-md sm:w-auto drop-shadow-lg hover:scale-105 animate-fade-in-up animation-delay-1800'
           >
             Conoce nuestros Certificados
           </Link>

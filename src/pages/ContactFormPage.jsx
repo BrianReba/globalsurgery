@@ -8,13 +8,16 @@ import {
 } from 'react-icons/fa';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import logo from '../assets/logo-global-surgery.png';
+// NAVIDAD - Remover después de temporada
+import logo from '../assets/logo-navidad.svg';
 import PdfUploadStandalone from '../components/PdfUploadStandalone';
 import MapModal from '../components/MapModal';
 
 // Componentes personalizados
 import FormStatus from '../components/FormStatus';
 import SubmitButton from '../components/SubmitButton';
+// NAVIDAD - Remover después de temporada
+import ChristmasStars from '../components/seasonal/ChristmasStars';
 
 // Custom hook
 import useContactForm from '../hooks/useContactForm';
@@ -28,8 +31,10 @@ const ContactPage = () => {
     'inline-flex items-center text-gray-600 hover:text-cyan-700 transition-colors duration-200 group text-sm';
 
   return (
-    <div className='bg-gradient-to-br from-gray-50 to-blue-50 min-h-[calc(100vh-64px)] py-20 px-4 sm:px-6 lg:px-8 mt-16'>
-      <div className='max-w-6xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden'>
+    <div className='bg-gradient-to-br from-gray-50 to-blue-50 min-h-[calc(100vh-64px)] py-20 px-4 sm:px-6 lg:px-8 mt-16 relative overflow-hidden'>
+      {/* NAVIDAD */}
+      <ChristmasStars variant="section" />
+      <div className='max-w-6xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative'>
         <div className='grid grid-cols-1 md:grid-cols-2'>
           <div className='p-8 md:p-12 lg:p-16 bg-gray-50 border-r border-gray-200'>
             <img

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { login as loginService } from '../services/authServices';
-import logo from '../assets/logo-global-surgery.png';
+// NAVIDAD - Remover después de temporada
+import logo from '../assets/logo-navidad.svg';
 import { ButtonSpinner } from '../components/LoadingSpinner';
 
 const LoginPage = () => {

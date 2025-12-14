@@ -8,10 +8,13 @@ import {
   FaMapMarkerAlt,
 } from 'react-icons/fa';
 import logo from '../assets/logo-blanco.png';
-import logoMain from '../assets/logo-global-surgery.png';
+// NAVIDAD - Remover después de temporada
+import logoMain from '../assets/logo-navidad.svg';
 // import cadit from '../assets/logo-cadit.png';
 // import pistech from '../assets/pistech-nobg.png';
 import MapModal from './MapModal';
+// NAVIDAD - Remover después de temporada
+import ChristmasStars from './seasonal/ChristmasStars';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -27,7 +30,9 @@ const Footer = () => {
   );
 
   return (
-    <footer className='bg-gray-900 text-gray-300'>
+    <footer className='bg-gray-900 text-gray-300 relative overflow-hidden'>
+      {/* NAVIDAD */}
+      <ChristmasStars variant="dark" />
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
         {/* Grid layout  */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10'>
@@ -220,7 +225,9 @@ const Footer = () => {
       </div>
 
       {/* Sección de cierre con logo */}
-      <div className='bg-gradient-to-b from-gray-900 via-gray-600 to-gray-500 py-16'>
+      <div className='bg-gradient-to-b from-gray-900 via-gray-600 to-gray-500 py-16 relative overflow-hidden'>
+        {/* NAVIDAD */}
+        <ChristmasStars variant="section" />
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center'>
           <div className='flex justify-center mb-8'>
             <img
