@@ -222,7 +222,7 @@ const ProductDetailPage = () => {
           )}
         </section>
 
-        <section className='text-center py-12 md:py-16 bg-gradient-to-r from-cyan-700 to-blue-700 rounded-lg shadow-lg mt-12 md:mt-16'>
+        <section className='text-center py-12 md:py-16 bg-cyan-700 rounded-lg shadow-lg mt-12 md:mt-16'>
           <h2 className='text-2xl sm:text-3xl font-bold text-white mb-4 px-4'>
             ¿Interesado en {system.systemName}?
           </h2>

@@ -17,7 +17,7 @@ import {
 import { Link } from 'react-router-dom';
 import MapModal from './MapModal';
 // NAVIDAD - Remover después de temporada
-import ChristmasStars from './seasonal/ChristmasStars';
+// import ChristmasStars from './seasonal/ChristmasStars';
 
 import imagenManos from '../assets/manos.jpg';
 import imagen2 from '../assets/img2.jpg';
@@ -205,7 +205,7 @@ const About = () => {
       {/* Sección inicial */}
       <div className='w-11/12 mx-auto text-center py-12 px-5 relative'>
         {/* NAVIDAD */}
-        <ChristmasStars variant="sparse" />
+        {/* <ChristmasStars variant="sparse" /> */}
         <h2 className='text-center font-poppins text-3xl md:text-4xl font-bold text-gray-900 pb-6 relative'>
           <span className='inline-block relative'>
             ¿Quiénes somos?
@@ -260,7 +260,7 @@ const About = () => {
         className='w-11/12 mx-auto py-12 px-5 relative'
       >
         {/* NAVIDAD */}
-        <ChristmasStars variant="section" />
+        {/* <ChristmasStars variant="section" /> */}
         <h2 className='text-center font-poppins text-3xl md:text-4xl font-bold text-gray-900 mb-12 relative'>
           <span className='inline-block relative'>
             Nuestros valores
@@ -296,7 +296,7 @@ const About = () => {
         className='w-full bg-gradient-to-r from-cyan-800 via-cyan-700 to-cyan-800 py-16 mt-16 relative overflow-hidden'
       >
         {/* NAVIDAD - estrellas blancas para fondo oscuro */}
-        <ChristmasStars variant="dark" />
+        {/* <ChristmasStars variant="dark" /> */}
         <div className='w-11/12 max-w-6xl mx-auto'>
           <h2 className='text-center font-poppins text-3xl md:text-4xl font-bold text-white mb-12'>
             Nuestra trayectoria profesional
@@ -350,7 +350,7 @@ const About = () => {
       {/* CTA de contacto */}
       <div className='w-11/12 mx-auto py-4 px-5 bg-white shadow-xl rounded-lg mt-12 relative overflow-hidden'>
         {/* NAVIDAD */}
-        <ChristmasStars variant="sparse" />
+        {/* <ChristmasStars variant="sparse" /> */}
         <h2 className='text-center font-poppins text-3xl md:text-4xl font-bold text-gray-900 mb-8 relative'>
           <span className='inline-block relative'>
             Contáctanos

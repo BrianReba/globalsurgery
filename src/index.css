@@ -81,11 +81,11 @@
 }
 
 /* --- NAVIDAD (Remover después de temporada) --- */
-@keyframes christmas-sparkle {
+/* @keyframes christmas-sparkle {
   0%, 100% { opacity: 0.4; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.2); }
 }
 .animate-christmas-sparkle {
   animation: christmas-sparkle 2s ease-in-out infinite;
-}
+} */
 /* --- FIN NAVIDAD --- */

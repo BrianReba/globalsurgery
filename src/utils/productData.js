@@ -675,6 +675,76 @@ const productData = [
     ]
   },
 
+  // =============================================
+  // === SISTEMA MISS PLF ========================
+  // =============================================
+  {
+    id: 'miss-plf',
+    systemName: 'MISS PLF',
+    systemTitle: 'Fijación Lumbar Posterior 5.50mm',
+    systemDescription: 'Cirugía Mínimamente Invasiva de Columna - Fijación Lumbar Posterior 5.50mm',
+    previewImage: '/miss-plf/imagen1.png',
+    category: 'PLF',
+    components: [
+      {
+        id: 'miss-plf-tornillo',
+        name: 'Sistema de tornillos canulados MIS con bajo perfil de tulipa',
+        image: '/miss-plf/imagen1.png',
+        altText: 'Sistema de tornillos canulados MIS con bajo perfil de tulipa',
+        features: [
+          'Patrón de rosca progresivo del tornillo',
+          'Patrón de rosca trapezoidal de la tulipa',
+        ],
+      },
+      {
+        id: 'miss-plf-acople',
+        name: 'Sistema de Acople MIS',
+        image: '/miss-plf/imagen2.png',
+        altText: 'Sistema de Acople MIS',
+        features: [
+          'Tulipa con diámetro ajustado para asegurar un correcto acople con el tubo MIS',
+          'Tubo MIS ultra delgado que optimiza la incisión',
+          'Poliaxialidad de 50° en todas las direcciones',
+        ],
+      },
+      {
+        id: 'miss-plf-reduccion',
+        name: 'Sistema de Reducción',
+        image: '/miss-plf/imagen3.jpeg',
+        altText: 'Sistema de Reducción',
+        features: [
+          'Sistema de rosca intratubular que permite reducir la barra en la tulipa de forma segura y precisa sin sistema adicional de reducción de barra',
+        ],
+      },
+      {
+        id: 'miss-plf-tubo',
+        name: 'Sistema de Tubo MIS',
+        image: '/miss-plf/imagen4.png',
+        altText: 'Sistema de Tubo MIS',
+        features: [
+          'Sistema de tubo MIS – tornillo diseñado para evitar su desacople',
+        ],
+      },
+    ],
+    instrumentation: {
+      title: 'MISS PLF Instrumental',
+      description: '',
+      images: [
+        { id: 'inst-miss', src: '/miss-plf/imagen 5.png', altText: 'MISS PLF Instrumental' },
+      ]
+    },
+    specifications: [
+      {
+        title: 'Sistema MISS PLF',
+        headers: ['Componente', 'Descripción'],
+        rows: [
+          { Componente: 'Sistema', Descripción: 'Minimally Invasive Spine Surgery' },
+          { Componente: 'Tipo', Descripción: '5.50mm Posterior Lumbar Fixation' },
+        ],
+      },
+    ]
+  },
+
 ];
 
 export default productData;

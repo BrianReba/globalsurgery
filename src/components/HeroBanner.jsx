@@ -2,9 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import primeraImagen from '../assets/img1.jpg';
 // NAVIDAD - Remover después de temporada
-import logoGlobalSurgery from '../assets/logo-navidad.svg';
+import logoGlobalSurgery from '../assets/logo-global-surgery.png';
 // NAVIDAD - Remover después de temporada
-import ChristmasStars from './seasonal/ChristmasStars';
+// import ChristmasStars from './seasonal/ChristmasStars';
 
 const HeroBanner = () => {
   return (
@@ -16,12 +16,12 @@ const HeroBanner = () => {
       >
         <div className='absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-blue-900/30 to-teal-800/20'></div>
         {/* NAVIDAD - Estrellitas decorativas - Remover después de temporada */}
-        <ChristmasStars variant='hero' />
+        {/* <ChristmasStars variant='hero' /> */}
         <div className='absolute bottom-6 right-6 z-5 opacity-25 hover:opacity-50 transition-opacity duration-300'>
           <img
             src={logoGlobalSurgery}
             alt='Global Surgery'
-            className='h-12 w-auto sm:h-16 lg:h-20 filter brightness-0 invert'
+            className='h-10 w-auto sm:h-14 lg:h-16 filter brightness-0 invert'
           />
         </div>
         <div className='relative h-full flex flex-col items-center justify-start pt-8 sm:justify-center text-center px-4 sm:px-6 md:px-8 z-10'>
@@ -32,11 +32,11 @@ const HeroBanner = () => {
             Columna y Neurocirugía
           </h1>
           {/* NAVIDAD - Remover después de temporada */}
-          <div className='mb-3 animate-fade-in-up animation-delay-400'>
+          {/* <div className='mb-3 animate-fade-in-up animation-delay-400'>
             <span className='inline-block px-6 py-2 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-white font-poppins font-semibold text-lg sm:text-xl rounded-full shadow-lg border border-yellow-300/50 tracking-wide drop-shadow-md'>
               🎄 ¡Felices Fiestas! 🎄
             </span>
-          </div>
+          </div> */}
           {/* Tarjetas de valores minimalistas */}
           <div className='flex flex-col gap-1 sm:gap-6 w-full max-w-md sm:max-w-4xl mx-auto'>
             {[

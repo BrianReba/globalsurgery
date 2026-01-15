@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 // NAVIDAD - Remover después de temporada
-import logo from '../assets/logo-navidad.svg';
+import logo from '../assets/logo-global-surgery.png';
 import { useLocation } from 'react-router-dom';
 
 const Navbar = () => {
@@ -40,7 +40,7 @@ const Navbar = () => {
               onClick={handleScrollToTop}
             >
               <img
-                className='h-14 sm:h-[4.5rem] w-auto transition-all'
+                className='h-12 sm:h-16 w-auto transition-all'
                 src={logo}
                 alt='Global Surgery Logo'
               />

@@ -77,7 +77,7 @@ const ProductsPage = () => {
           ))}
         </div>
 
-        <section className='text-center py-16 bg-gradient-to-r from-cyan-700 to-blue-700 rounded-2xl shadow-xl mt-20 max-w-5xl mx-auto'>
+        <section className='text-center py-16 bg-cyan-700 rounded-2xl shadow-xl mt-20 max-w-5xl mx-auto'>
           <div className='px-8 max-w-3xl mx-auto'>
             <h2 className='text-3xl sm:text-4xl font-bold text-white mb-6'>
               ¿Consultas o Asesoramiento?
