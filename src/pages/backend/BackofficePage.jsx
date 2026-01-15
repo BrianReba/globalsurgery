@@ -325,7 +325,7 @@ const BackofficePage = () => {
     }
   };
 
-  const fetchBudgets = async () => {
+  const fetchBudgets = useCallback(async () => {
     if (!token) return;
     setIsLoading(true);
     setError('');
@@ -341,13 +341,13 @@ const BackofficePage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) {
       fetchBudgets();
     }
-  }, [token]);
+  }, [token, fetchBudgets]);
 
   const handleAddLine = () => {
     setBudgetLines([

@@ -183,15 +183,17 @@ const About = () => {
       { threshold: 0.2 }
     );
 
-    if (experienciaRef.current) {
-      experienciaObserver.observe(experienciaRef.current);
+    const currentExperienciaRef = experienciaRef.current;
+
+    if (currentExperienciaRef) {
+      experienciaObserver.observe(currentExperienciaRef);
     }
 
     return () => {
       if (currentValoresRef) {
         observer.disconnect();
       }
-      if (experienciaRef.current) {
+      if (currentExperienciaRef) {
         experienciaObserver.disconnect();
       }
       if (intervalId) {

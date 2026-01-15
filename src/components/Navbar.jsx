@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 // NAVIDAD - Remover después de temporada
 import logo from '../assets/logo-global-surgery.png';
-import { useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const location = useLocation();
 
   // Detector de scroll para cambiar visibilidad de enlaces y logo
   useEffect(() => {
