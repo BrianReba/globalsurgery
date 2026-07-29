@@ -236,6 +236,89 @@ const productData = [
   },
 
   // =============================================
+  // === SISTEMA ACIF ============================
+  // =============================================
+  {
+    id: 'acif',
+    systemName: 'ACIF',
+    systemTitle: 'Sistema de Fusión Intersomática Cervical Anterior',
+    systemDescription: 'El sistema ACIF proporciona cages autosustentables cervicales en PEEK (polímero biocompatible), presentados en diversas alturas con una angulación de 6°, diseñados para optimizar la fusión intersomática anterior cervical.',
+    previewImage: '/acif/acif-onix-main.png',
+    category: 'ACIF',
+    components: [
+      {
+        id: 'acif-koral',
+        name: 'Cage KORAL Cervical',
+        image: '/acif/Koral-mainl.png',
+        altText: 'Cage Autosustentable KORAL Cervical en PEEK',
+        features: [
+          'Material PEEK biocompatible con marcadores radiopacos.',
+          'Diseño autosustentable para estabilidad inicial.',
+          'Diversas alturas disponibles para personalización anatómica.',
+          'Angulación de 6° para optimización de lordosis.',
+        ],
+      },
+      {
+        id: 'acif-koral-medidas',
+        name: 'KORAL - Medidas Disponibles',
+        image: '/acif/koral-medidas.png',
+        altText: 'Medidas KORAL Cervical',
+        features: [],
+      },
+      {
+        id: 'acif-koral-colocacion',
+        name: 'KORAL - Técnica de Colocación',
+        image: '/acif/koral-colocacion.png',
+        altText: 'Técnica de Colocación KORAL Cervical',
+        features: [],
+      },
+      {
+        id: 'acif-onix',
+        name: 'Cage ONIX Cervical',
+        image: '/acif/onix-main.png',
+        altText: 'Cage Autosustentable ONIX Cervical en PEEK',
+        features: [
+          'Diseño específico para fusión intersomática cervical anterior.',
+          'Superficie con dientes piramidales para estabilidad.',
+          'Material biocompatible de alta resistencia.',
+          'Técnica de inserción simplificada.',
+        ],
+      },
+      {
+        id: 'acif-onix-medidas',
+        name: 'ONIX - Medidas Disponibles',
+        image: '/acif/onix-medidas.jpg',
+        altText: 'Medidas ONIX Cervical',
+        features: [],
+      },
+      {
+        id: 'acif-instrumental',
+        name: 'Instrumental ACIF',
+        image: '/acif/caja-instrumental-Koral-1024x680.png',
+        altText: 'Instrumental Sistema ACIF',
+        features: [
+          'Set completo de instrumental especializado.',
+          'Herramientas de preparación del espacio discal.',
+          'Instrumentos de inserción y colocación de cages.',
+          'Compatible con técnicas mínimamente invasivas.',
+        ],
+      },
+    ],
+    specifications: [
+      {
+        title: 'Sistema ACIF - Información General',
+        headers: ['Componente', 'Descripción'],
+        rows: [
+          { Componente: 'Material', Descripción: 'PEEK biocompatible' },
+          { Componente: 'Angulación', Descripción: '6°' },
+          { Componente: 'Abordaje', Descripción: 'Anterior cervical' },
+          { Componente: 'Aplicación', Descripción: 'Fusión intersomática cervical' },
+        ],
+      },
+    ]
+  },
+
+  // =============================================
   // === SISTEMA LLIF ============================
   // =============================================
   {
@@ -681,8 +764,8 @@ const productData = [
   {
     id: 'miss-plf',
     systemName: 'MISS PLF',
-    systemTitle: 'Fijación Lumbar Toracolumbar MISS',
-    systemDescription: 'Cirugía Mínimamente Invasiva de Columna - Fijación Lumbar Toracolumbar MISS',
+    systemTitle: 'Fijación Toracolumbar MISS',
+    systemDescription: 'Cirugía Mínimamente Invasiva de Columna - Fijación Toracolumbar MISS',
     previewImage: '/miss-plf/imagen1.png',
     category: 'PLF',
     components: [

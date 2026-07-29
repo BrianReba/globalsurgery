@@ -23,6 +23,8 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import AcifKoralPage from './pages/AcifKoralPage';
+import AcifOnixPage from './pages/AcifOnixPage';
 import PoliticasPage from './pages/PoliticasPage';
 import ContactPage from './pages/ContactFormPage'; 
 import ErrorPage from './pages/ErrorPage';
@@ -88,6 +90,8 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "products", element: <ProductsPage /> },
       { path: "products/:systemId", element: <ProductDetailPage /> },
+      { path: "products/acif/koral", element: <AcifKoralPage /> },
+      { path: "products/acif/onix", element: <AcifOnixPage /> },
       { path: "politicas-terminos", element: <PoliticasPage /> },
       { path: "contact", element: <ContactPage /> },
       { path: "certificados", element: <CertificadosPage /> },

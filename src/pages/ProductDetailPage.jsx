@@ -45,7 +45,7 @@ const SpecificationTable = ({ title, headers, rows, note }) => (
 );
 
 const ProductDetailPage = () => {
-  const { systemId } = useParams(); // Obtiene el 'systemId' de la URL del producto
+  const { systemId } = useParams();
   const system = productData.find((s) => s.id === systemId);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -73,6 +73,25 @@ const ProductDetailPage = () => {
     setIsLoading(false);
   };
 
+  const isAcifCategory = systemId === 'acif';
+
+  const acifSubProducts = [
+    {
+      id: 'koral',
+      name: 'KORAL',
+      description: 'Cage autosustentable cervical en PEEK (polímero biocompatible)',
+      image: '/acif/Koral-mainl.png',
+      link: '/products/acif/koral'
+    },
+    {
+      id: 'onix',
+      name: 'ONIX',
+      description: 'Cage autosustentable cervical en PEEK (polímero biocompatible)',
+      image: '/acif/acif-onix-main.png',
+      link: '/products/acif/onix'
+    }
+  ];
+
   return (
     <div className='bg-gray-50 py-16 px-4 sm:px-6 lg:px-8 mt-16 md:mt-20'>
       <div className='max-w-7xl mx-auto'>
@@ -98,11 +117,146 @@ const ProductDetailPage = () => {
           </Link>
         </div>
 
-        {/* System Section  */}
-        <section
-          id={system.id}
-          className='mb-12 md:mb-16'
-        >
+        {/* ACIF Category Layout */}
+        {isAcifCategory && (
+          <div className='mb-12'>
+            <div className='text-center mb-12'>
+              <h1 className='text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight leading-tight'>
+                Sistema ACIF
+              </h1>
+              <p className='mt-4 text-xl text-gray-600 max-w-2xl mx-auto'>
+                Anterior Cervical Interbody Fusion
+              </p>
+              <div className='mt-6 w-24 h-1 bg-cyan-600 mx-auto'></div>
+              <p className='mt-6 max-w-3xl mx-auto text-lg text-gray-600'>
+                {system.systemDescription}
+              </p>
+            </div>
+
+            {/* Sub-products Grid */}
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto'>
+              {acifSubProducts.map((product) => (
+                <Link
+                  key={product.id}
+                  to={product.link}
+                  className='bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:translate-y-[-4px] border border-gray-100 group'
+                >
+                  <div className='relative w-full h-64 bg-gray-100 flex items-center justify-center overflow-hidden'>
+                    <img
+                      src={product.image}
+                      alt={`Sistema ${product.name}`}
+                      className='object-contain w-full h-full p-6 group-hover:scale-105 transition-transform duration-300'
+                      loading='lazy'
+                    />
+                  </div>
+                  <div className='p-8 flex flex-col flex-grow'>
+                    <h3 className='text-2xl font-bold text-gray-900 mb-2'>
+                      {product.name}
+                    </h3>
+                    <div className='w-16 h-1 bg-cyan-100 my-3'></div>
+                    <p className='text-gray-600 flex-grow'>
+                      {product.description}
+                    </p>
+                    <div className='mt-6'>
+                      <span className='inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-cyan-700 group-hover:bg-cyan-800 transition-colors'>
+                        Ver Más
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          className='h-5 w-5 ml-2'
+                          viewBox='0 0 20 20'
+                          fill='currentColor'
+                        >
+                          <path
+                            fillRule='evenodd'
+                            d='M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z'
+                            clipRule='evenodd'
+                          />
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Instrumental Section for ACIF */}
+            <div className='mt-16'>
+              <h3 className='text-2xl font-bold text-gray-900 mb-8 text-center'>
+                Instrumental
+              </h3>
+              
+              <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8'>
+                <div className='lg:col-span-2 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 flex items-center justify-center'>
+                  <img
+                    src='/acif/caja-instrumental-Koral-1024x680.png'
+                    alt='Caja Instrumental ACIF'
+                    className='object-contain w-full h-64 rounded-lg'
+                    loading='lazy'
+                  />
+                </div>
+                <div className='bg-cyan-700 rounded-2xl p-8 flex flex-col justify-center'>
+                  <h4 className='text-xl font-semibold text-white mb-4'>
+                    Instrumental ACIF
+                  </h4>
+                  <ul className='space-y-3 text-cyan-100'>
+                    <li className='flex items-start'>
+                      <span className='mr-2'>•</span>
+                      Set completo de instrumental especializado
+                    </li>
+                    <li className='flex items-start'>
+                      <span className='mr-2'>•</span>
+                      Herramientas de preparación del espacio discal
+                    </li>
+                    <li className='flex items-start'>
+                      <span className='mr-2'>•</span>
+                      Instrumentos de inserción y colocación
+                    </li>
+                    <li className='flex items-start'>
+                      <span className='mr-2'>•</span>
+                      Compatible con técnicas mínimamente invasivas
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-8'>
+                <div className='bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 flex items-center justify-center'>
+                  <img
+                    src='/acif/instrumental-Koral-vista-1-1024x798.png'
+                    alt='Instrumental ACIF Vista 1'
+                    className='object-contain w-full h-56 rounded-lg'
+                    loading='lazy'
+                  />
+                </div>
+                <div className='bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 flex items-center justify-center'>
+                  <img
+                    src='/acif/instrumental-Koral-vista-2-1024x733.png'
+                    alt='Instrumental ACIF Vista 2'
+                    className='object-contain w-full h-56 rounded-lg'
+                    loading='lazy'
+                  />
+                </div>
+              </div>
+
+              {/* Medidas Full Width */}
+              <div className='w-full'>
+                <img
+                  src='/acif/todas las medidas.jpg'
+                  alt='Todas las medidas ACIF'
+                  className='w-full object-contain rounded-xl shadow-lg'
+                  loading='lazy'
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* System Section - Only for non-ACIF systems */}
+        {!isAcifCategory && (
+          <section
+            id={system.id}
+            className='mb-12 md:mb-16'
+          >
           <div className='mb-8 text-center md:text-left'>
             <h2 className='text-sm font-semibold text-cyan-700 uppercase tracking-wide'>
               {system.systemName}
@@ -221,8 +375,10 @@ const ProductDetailPage = () => {
             </div>
           )}
         </section>
+        )}
 
-        <section className='text-center py-12 md:py-16 bg-cyan-700 rounded-lg shadow-lg mt-12 md:mt-16'>
+        {!isAcifCategory && (
+          <section className='text-center py-12 md:py-16 bg-cyan-700 rounded-lg shadow-lg mt-12 md:mt-16'>
           <h2 className='text-2xl sm:text-3xl font-bold text-white mb-4 px-4'>
             ¿Interesado en {system.systemName}?
           </h2>
@@ -244,6 +400,7 @@ const ProductDetailPage = () => {
             </Link> */}
           </div>
         </section>
+        )}
       </div>
     </div>
   );
