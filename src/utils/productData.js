@@ -608,7 +608,7 @@ const productData = [
   {
     id: 'cplf',
     systemName: 'CPLF',
-    systemTitle: 'Sistema de Fusión Cervical Posterior y Lateral',
+    systemTitle: 'Sistema de Fusión Toracolumbar Fenestrado',
     systemDescription: 'El sistema CPLF combina técnicas de fusión cervical posterior con abordajes laterales, proporcionando una solución integral para patologías cervicales complejas.',
     previewImage: '/cplf/primero-cplf.png',
     components: [
@@ -681,8 +681,8 @@ const productData = [
   {
     id: 'miss-plf',
     systemName: 'MISS PLF',
-    systemTitle: 'Fijación Lumbar Posterior 5.50mm',
-    systemDescription: 'Cirugía Mínimamente Invasiva de Columna - Fijación Lumbar Posterior 5.50mm',
+    systemTitle: 'Fijación Lumbar Toracolumbar MISS',
+    systemDescription: 'Cirugía Mínimamente Invasiva de Columna - Fijación Lumbar Toracolumbar MISS',
     previewImage: '/miss-plf/imagen1.png',
     category: 'PLF',
     components: [
