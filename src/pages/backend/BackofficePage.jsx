@@ -17,8 +17,9 @@ import {
   FaMinusCircle,
 } from 'react-icons/fa';
 import { generateBudgetPDF } from '../../utils/pdfGenerator';
-// NAVIDAD - Remover después de temporada
-import logoImage from '../../assets/logo-navidad.svg';
+import logoImage from '../../assets/logo-global-surgery.png';
+// NAVIDAD - Descomentar en temporada (reemplaza al logo de arriba)
+// import logoImage from '../../assets/logo-navidad.svg';
 import { SectionLoader, ButtonSpinner } from '../../components/LoadingSpinner';
 //iva
 const taxOptions = [
